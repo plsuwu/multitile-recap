@@ -1,6 +1,6 @@
 # multitile recap
 
-this was supposed to generate a 9x9 recap but the recaps are locked behind the twitch gql api so this may never eventuate.
+this was supposed to generate a 3x3 panel monthly recap but the recaps are locked behind the twitch gql api so this may never eventuate.
 
 ## install & run
 
