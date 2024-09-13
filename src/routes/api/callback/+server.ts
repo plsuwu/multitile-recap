@@ -3,7 +3,6 @@ import { db, dbInit, dbInsert, dbSelect, dbUpdate } from '@server/db';
 import { buildAuthorizedHeader } from '@server/utility';
 import { redirect, type RequestEvent } from '@sveltejs/kit';
 import { OAuth2RequestError } from 'arctic';
-import { profile } from 'console';
 import { generateIdFromEntropySize } from 'lucia';
 
 const HELIX = {
@@ -91,14 +90,7 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
 				id,
 				login,
 				display_name,
-				// type,
-				// broadcaster_type,
-				// description,
 				profile_image_url,
-				// offline_image_url,
-				// view_count,
-				// email,
-				// created_at
 			} = user.data[0];
 
 			const userData = {

@@ -78,10 +78,18 @@
 	{decreaseGridsize}
 />
 <div class="flex flex-col">
-	<button
-		class="self-end italic opacity-55 transition-opacity duration-100 hover:opacity-100 my-6"
-		on:click={toggleModal}>options</button
-	>
+	<div class="my-6 w-full flex flex-row justify-between">
+		<a
+			href="/"
+			class="self-start transition-opacity duration-100 hover:opacity-55"
+		>
+			{'<-'} back
+		</a>
+		<button
+			class="self-end italic opacity-55 transition-opacity duration-100 hover:opacity-100"
+			on:click={toggleModal}>options</button
+		>
+	</div>
 	<div class="flex flex-col">
 		{#key usingRecaps || userRows}
 			{#each Array(rows) as _, rowIdx}

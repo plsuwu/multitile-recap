@@ -1,5 +1,4 @@
 import type { PageServerLoad } from './$types';
-import { twitch } from '@server/auth';
 import { redirect } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ locals }) => {

@@ -1,9 +1,5 @@
 import sqlite from 'better-sqlite3';
-import { assert } from 'console';
-
 const db = import.meta.env.DEV ? sqlite('dev.db') : sqlite(':memory:');
-db.pragma('journal_mode = WAL');
-
 dbInit();
 
 type TableColumns<T = string> = { [key: string]: T };
@@ -130,9 +126,7 @@ function dbInit(test: boolean = false) {
 				`)`
 		);
 
-		// console.log(tdb);
 		tdb.run();
-
 		return;
 	}
 	// ------------------------------------------------------
