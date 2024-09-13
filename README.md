@@ -1,16 +1,41 @@
-# multitile recap
+# create-svelte
 
-this was supposed to generate a 3x3 panel monthly recap but the recaps are locked behind the twitch gql api so this may never eventuate.
+Everything you need to build a Svelte project, powered by
+[`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
 
-## install & run
+## Creating a project
 
-uses an in-memory cache with bun's builtin sqlite db, so it must be run with the bun runtime rather than node.js:
+If you're seeing this, you've probably already done this step. Congrats!
 
 ```bash
-git clone https://github.com/plsuwu/multitile-recap
-cd multitile-recap
-bun install
+# create a new project in the current directory
+npm create svelte@latest
 
-# and then run with bun js runtime, passing the `dev` flag to vite:
-bun --bun run dev -- --mode dev
+# create a new project in my-app
+npm create svelte@latest my-app
 ```
+
+## Developing
+
+Once you've created a project and installed dependencies with `npm install` (or
+`pnpm install` or `yarn`), start a development server:
+
+```bash
+npm run dev
+
+# or start the server and open the app in a new browser tab
+npm run dev -- --open
+```
+
+## Building
+
+To create a production version of your app:
+
+```bash
+npm run build
+```
+
+You can preview the production build with `npm run preview`.
+
+> To deploy your app, you may need to install an
+> [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.

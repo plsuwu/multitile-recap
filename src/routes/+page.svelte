@@ -1,34 +1,33 @@
 <script lang="ts">
-	import HLink from '@/components/HLink.svelte';
-	import Error from '@/components/Error.svelte';
 	import { page } from '$app/stores';
+	// console.log($page);
 
-	let where = '';
-	let why = '';
-
-	if ($page.data.error && $page.data.error.where && $page.data.error.why) {
-		where = $page.data.error.where;
-		why = $page.data.error.why;
-	}
+	const { display_name, profile_image_url } = $page.data;
 </script>
 
-<div>
-	<!-- {#if where !== '' && why !== ''} -->
-	<!-- 	<Error {where} {why} /> -->
-	<!-- {/if} -->
-
-	{#if $page.data.displayName}
-		 <div class='flex flex-col items-center justify-center'>
-			<div class='my-2 text-xl'>omg {$page.data.displayName} hiii</div>
-			<img src={$page.data.profileImageUrl} alt="user profile" />
-		</div>
-		<div class="flex flex-col my-4">
-			<HLink href={`/logout?t=${$page.data.access}`} text={'<- sign out'} />
-			<HLink href={`/follows`} text={'generate ->'} />
-		</div>
-	{:else}
-		<div></div>
-
-		<HLink href={'/auth'} text={'auth with twitch ->'} />
-	{/if}
+<div class="mb-12 mt-4 flex w-max flex-col space-y-2">
+	<a
+		class="rounded border p-0.5 transition-colors duration-100 hover:bg-black/20"
+		href="/api/test">test db</a
+	>
+	<a
+		class="rounded border p-0.5 transition-colors duration-100 hover:bg-black/20"
+		href="/api/login?t=true">auth: test new user</a
+	>
+	<a
+		class="rounded border p-0.5 transition-colors duration-100 hover:bg-black/20"
+		href="/api/login">auth: test user from db</a
+	>
+	<a
+		class="rounded border p-0.5 transition-colors duration-100 hover:bg-black/20"
+		href="/api/generate">auth: test generate</a
+	>
 </div>
+
+{#if $page.data.display_name && $page.data.profile_image_url}
+	<div>
+		<span>omg <span class="text-lg">{display_name}</span> hiii</span>
+	</div>
+	<img src={profile_image_url} alt="user profile" class="size-52" />
+	<a href="/api/generate">run a generation {'->'}</a>
+{/if}
