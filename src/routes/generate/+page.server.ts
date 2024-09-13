@@ -1,5 +1,5 @@
 import { dbSelect } from '@server/db';
-import type { PageServerLoad } from '@sveltejs/kit';
+import { redirect, type PageServerLoad } from '@sveltejs/kit';
 
 export const load: PageServerLoad = ({ locals }) => {
 	const access = locals.user?.access;
@@ -8,12 +8,7 @@ export const load: PageServerLoad = ({ locals }) => {
 	const userId = locals.user?.id;
 
 	if (!access || !sessionId || !twitchId || !userId) {
-		return new Response(null, {
-			status: 307,
-			headers: {
-				Location: '/',
-			},
-		});
+        redirect(307, '/');
 	}
 
 	const ttvCache = dbSelect({

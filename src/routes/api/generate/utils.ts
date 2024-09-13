@@ -180,6 +180,9 @@ async function fetchRecaps(twitchId: string, userId: string, token: string) {
                             },
                         },
                     },
+                    {
+                        operationName: 'RecapsQuery',
+                        variables: { 'channelId': '598826002', 'endsAt': '2024-09-02T00:00:00.000Z' }, 'extensions': { 'persistedQuery': { 'version': 1, 'sha256Hash': '3d60235d1413d86448175cc84c6b6a68537495f6954730fe95438707c8d68e57' } } }
                 ];
 
                 const res = await fetch(`https://gql.twitch.tv/gql`, {
@@ -189,11 +192,11 @@ async function fetchRecaps(twitchId: string, userId: string, token: string) {
                 });
 
                 const [body] = await res.json();
-                const { id, displayName, profileImageURL, self } =
-                    body.data.user;
-
-                const result = { id, displayName, profileImageURL, self };
-                return result;
+                // const { id, displayName, profileImageURL, self } =
+                //     body.data.user;
+                //
+                // const result = { id, displayName, profileImageURL, self };
+                return body;
             })
         );
 
