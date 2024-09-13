@@ -1,6 +1,6 @@
+import { twitch, lucia } from '@server/auth';
 import { db, dbInit, dbInsert, dbSelect, dbUpdate } from '@server/db';
 import { buildAuthorizedHeader } from '@server/utility';
-import { twitch, lucia } from '@server/auth';
 import { redirect, type RequestEvent } from '@sveltejs/kit';
 import { OAuth2RequestError } from 'arctic';
 import { profile } from 'console';
@@ -30,8 +30,8 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
 			headers: headers,
 		});
 		const user = await userRequest.json();
-		console.log(tokens, user);
-		const accessTokenExpiresAt = tokens.accessTokenExpiresAt;
+		// console.log(tokens, user);
+		// const accessTokenExpiresAt = tokens.accessTokenExpiresAt;
 
 		// .. -> `SELECT <columns ?? '*'> FROM <name> <<WHERE {where.{column, value}}> ?? null>`
 		// .. -> `INSERT INTO <name> (<...data.keys>) VALUES (<...data.values>)

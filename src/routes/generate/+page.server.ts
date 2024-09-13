@@ -8,7 +8,7 @@ export const load: PageServerLoad = ({ locals }) => {
 	const userId = locals.user?.id;
 
 	if (!access || !sessionId || !twitchId || !userId) {
-        redirect(307, '/');
+		redirect(307, '/');
 	}
 
 	const ttvCache = dbSelect({
@@ -23,7 +23,7 @@ export const load: PageServerLoad = ({ locals }) => {
 
 	if (!ttvCache) {
 		// this is probably either manual navigation to this page
-        // or the result of an error (DB??)
+		// or the result of an error (DB??)
 		return;
 	}
 

@@ -1,4 +1,7 @@
-import { TWITCH_CLIENT_ID, TWITCH_CLIENT_GQL_HARDCODED } from '$env/static/private';
+import {
+	TWITCH_CLIENT_ID,
+	TWITCH_CLIENT_GQL_HARDCODED,
+} from '$env/static/private';
 
 const buildAuthorizedHeader = (
 	token: string,

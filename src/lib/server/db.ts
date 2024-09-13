@@ -37,15 +37,12 @@ const dbSelect = (table: GenericReadSchema): TableColumns => {
 	const value = table.where ? table.where.value : null;
 
 	if (where && value) {
-
 		const query = db
 			.prepare(`SELECT ${columns} FROM ${name}${where}`)
 			.bind(value as string);
 		const res = query.get();
 		return res as TableColumns;
-
 	} else {
-
 		const query = db.prepare(`SELECT ${columns} FROM ${name}`).get();
 		return query as TableColumns;
 	}
@@ -168,7 +165,7 @@ function dbInit(test: boolean = false) {
 			`subs_data TEXT,` +
 			`follows_data TEXT NOT NULL,` +
 			`recaps_data TEXT,` +
-            `channel_data TEXT,` +
+			`channel_data TEXT,` +
 			`created_at TEXT NOT NULL,` +
 			`FOREIGN KEY (user_id) REFERENCES user(id)` +
 			`)`
