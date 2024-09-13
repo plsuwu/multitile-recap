@@ -1,3 +1,52 @@
+/* ---------------- HELIX -------------------- */
+export interface FollowsResponse {
+    data: Array<{
+        broadcaster_id: string;
+        broadcaster_login: string;
+        broadcaster_name: string;
+        followed_at: string;
+    }>;
+    pagination: {
+        cursor: string; // base64-encoded object
+    };
+    total: number;
+}
+
+export interface UserSubscriptions {
+    broadcaster_id: string;
+    broadcaster_login: string;
+    broadcaster_name: string;
+    gifter_id?: string;
+    gifter_login?: string;
+    is_gift: boolean;
+    tier: SubscriptionTier;
+}
+
+enum SubscriptionTier {
+    'TIER1' = 1000,
+    'TIER2' = 2000,
+    'TIER3' = 3000,
+}
+
+export interface SubscriptionsResponse {
+    data: Array<{
+        broadcaster_id: string;
+        broadcaster_login: string;
+        broadcaster_name: string;
+        gifter_id?: string;
+        gifter_login?: string;
+        is_gift: boolean;
+        tier: SubscriptionTier;
+    }>;
+}
+
+export interface SubscriptionsResponseError {
+    error: string;
+    status: number;
+    message: string;
+}
+
+/* ----------------- GQL --------------------- */
 interface Badges {
     clickAction: string;
     clickURL: string | null;

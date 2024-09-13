@@ -1,5 +1,5 @@
-import { db, dbInit, dbInsert, dbSelect, dbUpdate } from '@/lib/server/db';
-import { buildAuthorizedHeader } from '@/lib/server/utility';
+import { db, dbInit, dbInsert, dbSelect, dbUpdate } from '@server/db';
+import { buildAuthorizedHeader } from '@server/utility';
 import { twitch, lucia } from '@server/auth';
 import { redirect, type RequestEvent } from '@sveltejs/kit';
 import { OAuth2RequestError } from 'arctic';

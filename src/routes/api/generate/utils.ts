@@ -6,49 +6,12 @@ import {
 } from '$env/static/private';
 import { dbInsert, dbSelect } from '@server/db';
 import { buildAuthorizedHeader } from '@server/utility';
-
+import type { RecapsQueryResponse, SubscriptionsResponse, SubscriptionsResponseError, FollowsResponse, UserSubscriptions } from '$lib/types';
 const TWITCH_GQL_ENDPOINT = 'https://gql.twitch.tv/gql';
 const HELIX_FOLLOWED_ENDPOINT = 'https://api.twitch.tv/helix/channels/followed';
 const HELIX_SUBSCRIPTIONS_ENDPOINT =
     'https://api.twitch.tv/helix/subscriptions/user';
 // const RECAP_BASE_ENDPOINT = 'https://www.twitch.tv/recaps';
-
-interface FollowsResponse {
-    data: Array<{
-        broadcaster_id: string;
-        broadcaster_login: string;
-        broadcaster_name: string;
-        followed_at: string;
-    }>;
-    pagination: {
-        cursor: string; // base64-encoded object
-    };
-    total: number;
-}
-
-enum SubscriptionTier {
-    'TIER1' = 1000,
-    'TIER2' = 2000,
-    'TIER3' = 3000,
-}
-
-interface SubscriptionsResponse {
-    data: Array<{
-        broadcaster_id: string;
-        broadcaster_login: string;
-        broadcaster_name: string;
-        gifter_id?: string;
-        gifter_login?: string;
-        is_gift: boolean;
-        tier: SubscriptionTier;
-    }>;
-}
-
-export interface SubscriptionsResponseError {
-    error: string;
-    status: number;
-    message: string;
-}
 
 async function fetchFollows(
     twitchId: string,
@@ -136,15 +99,15 @@ async function fetchRecaps(twitchId: string, userId: string, token: string) {
     // !!
 
     const helixHeaders = buildAuthorizedHeader(token);
-    const follows = await fetchFollows(twitchId, helixHeaders);
-
-    let subscriptions = await Promise.all(
+    const follows: FollowsResponse = await fetchFollows(twitchId, helixHeaders);
+    let subscriptions: Array<UserSubscriptions | undefined> = await Promise.all(
         follows.data.map(async (broadcaster) => {
             const res = await fetchSubscriptions(
                 twitchId,
                 broadcaster.broadcaster_id,
                 helixHeaders
             );
+
             if (!(res as SubscriptionsResponseError).status) {
 
                 // flatten single-item broadcaster array
@@ -155,9 +118,8 @@ async function fetchRecaps(twitchId: string, userId: string, token: string) {
     );
 
     subscriptions = subscriptions.filter(Boolean);
-
     try {
-        const recaps = await Promise.all(
+        const recaps: RecapsQueryResponse[] = await Promise.all(
             subscriptions.map(async (broadcaster) => {
                 const [matches] = [...new Date().toISOString().matchAll(/(\d{4}-\d{2}-)/gm)];
                 const currentRecapMonth = matches[0];
@@ -180,22 +142,15 @@ async function fetchRecaps(twitchId: string, userId: string, token: string) {
                             },
                         },
                     },
-                    {
-                        operationName: 'RecapsQuery',
-                        variables: { 'channelId': '598826002', 'endsAt': '2024-09-02T00:00:00.000Z' }, 'extensions': { 'persistedQuery': { 'version': 1, 'sha256Hash': '3d60235d1413d86448175cc84c6b6a68537495f6954730fe95438707c8d68e57' } } }
                 ];
 
-                const res = await fetch(`https://gql.twitch.tv/gql`, {
+                const res = await fetch(TWITCH_GQL_ENDPOINT, {
                     method: 'POST',
                     headers: gqlHeaders,
                     body: JSON.stringify(op),
                 });
 
                 const [body] = await res.json();
-                // const { id, displayName, profileImageURL, self } =
-                //     body.data.user;
-                //
-                // const result = { id, displayName, profileImageURL, self };
                 return body;
             })
         );

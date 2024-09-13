@@ -1,31 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-
-	// const { follows, subs, recaps, display_name } = $page.data;
+    import type { RecapsQueryResponse } from '$lib/types';
 
 	console.log($page.data);
 
-	interface RecapData {
-		id: string;
-		displayName: string;
-		profileImageURL: string;
-		self: {
-			subscriptionBenefit: {
-				id: string;
-				endsAt: string;
-				platform: string;
-				gift?: {
-					login?: string;
-					displayName?: string;
-				};
-				isGift: boolean;
-				interval: {
-					unit: string;
-					duration: number;
-				};
-			};
-		};
-	}
+    const recaps: RecapsQueryResponse = $page.data.recaps;
 
 	function localeString(date: Date) {
 		return date.toLocaleString();

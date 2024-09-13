@@ -3,6 +3,7 @@ import { fetchRecaps } from './utils';
 import { dbSelect } from '@server/db';
 import { redirect } from '@sveltejs/kit';
 
+
 export const GET = async (event: RequestEvent): Promise<Response> => {
 	const access = event.locals.user?.access;
 	const sessionId = event.locals.session?.id;
