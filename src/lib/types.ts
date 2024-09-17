@@ -152,3 +152,13 @@ export interface RecapsQueryResponse {
 		requestID: string;
 	};
 }
+
+export interface CacheData {
+    id: string;
+    data: {
+        following: string;
+        subscriptions: string;
+        recaps: string;
+    };
+}
+

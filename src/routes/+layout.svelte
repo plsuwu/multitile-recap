@@ -14,8 +14,6 @@
 		rel="stylesheet"
 	/>
 </head>
-<div
-	class="flex flex-row items-center justify-center"
->
+<div class="flex flex-row items-center justify-center">
 	<slot />
 </div>

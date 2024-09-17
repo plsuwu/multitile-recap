@@ -1,7 +1,8 @@
-import { dbSelect } from '@server/db';
+import RedisCacheWorker from '@server/cache';
+import type { CacheData } from '@/lib/types';
 import { redirect, type PageServerLoad } from '@sveltejs/kit';
 
-export const load: PageServerLoad = ({ locals }) => {
+export const load: PageServerLoad = async ({ locals }) => {
 	const access = locals.user?.access;
 	const sessionId = locals.session?.id;
 	const twitchId = locals.user?.twitch_id;
@@ -11,26 +12,24 @@ export const load: PageServerLoad = ({ locals }) => {
 		redirect(307, '/');
 	}
 
-	const ttvCache = dbSelect({
-		name: 'ttv_cache',
-		where: {
-			column: 'user_id',
-			value: userId,
-		},
-	});
+    const { display_name } = locals.user;
+    const worker = new RedisCacheWorker({});
+    const cached: CacheData | null = await worker.readData(userId);
 
-	const { display_name } = locals.user;
+    worker.close();
 
-	if (!ttvCache) {
+
+	if (!cached) {
 		// this is probably either manual navigation to this page
 		// or the result of an error (DB??)
 		return;
 	}
+    const { following, subscriptions, recaps } = cached.data;
 
 	return {
 		display_name,
-		subs: JSON.parse(ttvCache.subs_data),
-		follows: JSON.parse(ttvCache.follows_data),
-		recaps: JSON.parse(ttvCache.recaps_data),
+		subs: JSON.parse(subscriptions),
+		follows: JSON.parse(following),
+		recaps: JSON.parse(recaps),
 	};
 };

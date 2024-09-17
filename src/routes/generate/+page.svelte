@@ -78,7 +78,7 @@
 	{decreaseGridsize}
 />
 <div class="flex flex-col">
-	<div class="my-6 w-full flex flex-row justify-between">
+	<div class="my-6 flex w-full flex-row justify-between">
 		<a
 			href="/"
 			class="self-start transition-opacity duration-100 hover:opacity-55"

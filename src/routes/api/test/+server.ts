@@ -1,8 +1,8 @@
-import { test } from '@/lib/server/db';
 import { redirect, type RequestEvent } from '@sveltejs/kit';
+import { testCacheRw } from '@server/tests';
 
 export async function GET(event: RequestEvent): Promise<Response> {
-	// test();
+	testCacheRw();
 
 	redirect(302, '/');
 }

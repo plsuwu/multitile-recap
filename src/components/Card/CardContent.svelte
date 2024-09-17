@@ -8,17 +8,17 @@
 	const formatted = (time: number) => {
 		const days = Math.floor(time / 1440);
 		const hours = Math.floor((time % 1440) / 60);
-        const mins = time % 60;
+		const mins = time % 60;
 
-        let res = '';
+		let res = '';
 
-        if (days > 0) res += `${days}d `;
+		if (days > 0) res += `${days}d `;
 
-        if (hours > 0) res += `${hours}h `;
+		if (hours > 0) res += `${hours}h `;
 
-        if (mins > 0 && days <= 0) res += `${mins}m `;
+		if (mins > 0 && days <= 0) res += `${mins}m `;
 
-        return res.trim();
+		return res.trim();
 	};
 
 	const watchtime = formatted(
@@ -60,10 +60,12 @@
 		</div>
 
 		<div class="mt-[50px]">Streams Watched</div>
-		<div class="text-[#fab4ff]">{Number(streamsPlayed)} of {streamsStreamed}</div>
+		<div class="text-[#fab4ff]">
+			{Number(streamsPlayed)} of {streamsStreamed}
+		</div>
 	</div>
 
-	<div class="flex flex-row flex-0 justify-around items-center mt-[50px]">
+	<div class="flex-0 mt-[50px] flex flex-row items-center justify-around">
 		<div class="text-[#fab4ff]">{@html Twitch}</div>
 		<div>#TWITCHRECAP</div>
 	</div>

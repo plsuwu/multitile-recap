@@ -1,6 +1,5 @@
 import type { RequestEvent } from './$types';
 import { fetchRecaps } from './utils';
-import { dbSelect } from '@server/db';
 import { redirect } from '@sveltejs/kit';
 
 export const GET = async (event: RequestEvent): Promise<Response> => {
@@ -24,7 +23,8 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
 		redirect(307, '/api/login');
 	}
 
-	const _recaps = await fetchRecaps(twitchId, userId, access);
+	// const recaps = await fetchRecaps(twitchId, userId, access);
+	await fetchRecaps(twitchId, userId, access);
 
 	return new Response(null, {
 		status: 302,
