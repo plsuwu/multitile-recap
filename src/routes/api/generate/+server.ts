@@ -23,7 +23,6 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
 		redirect(307, '/api/login');
 	}
 
-	// const recaps = await fetchRecaps(twitchId, userId, access);
 	await fetchRecaps(twitchId, userId, access);
 
 	return new Response(null, {

@@ -1,4 +1,9 @@
-import type { Adapter, DatabaseSession, DatabaseUser, RegisteredDatabaseUserAttributes } from 'lucia';
+import type {
+	Adapter,
+	DatabaseSession,
+	DatabaseUser,
+	RegisteredDatabaseUserAttributes,
+} from 'lucia';
 import type {
 	RedisClientType,
 	RedisFunctions,
@@ -13,16 +18,15 @@ interface RedisAdapterOptions {
 }
 
 interface CachedUserAttributes {
-    id: string;
-    twitch_id: string;
-    login: string;
-    display_name: string;
-    profile_image_url: string;
-    access: string;
-    refresh: string;
-    refresh_after: string;
+	id: string;
+	twitch_id: string;
+	login: string;
+	display_name: string;
+	profile_image_url: string;
+	access: string;
+	refresh: string;
+	refresh_after: string;
 }
-
 
 export class RedisAdapter implements Adapter {
 	private redis: RedisClientType<RedisModules, RedisFunctions, RedisScripts>;
@@ -59,18 +63,22 @@ export class RedisAdapter implements Adapter {
 	async getSessionAndUser(
 		sessionId: string
 	): Promise<[DatabaseSession | null, DatabaseUser | null]> {
-        const worker = new RedisCacheWorker({});
+		const worker = new RedisCacheWorker({});
 		const sessionString = await this.redis.get(this.sessionKey(sessionId));
 		if (!sessionString) return [null, null];
 		const session = this.transformIntoDatabaseSession(sessionString);
 
-        const data: CachedUserAttributes | null = await worker.readUser<CachedUserAttributes>(session.userId);
-        if (!data) return [null, null];
+		const data: CachedUserAttributes | null =
+			await worker.readUser<CachedUserAttributes>(session.userId);
+		if (!data) return [null, null];
 
-        // attributes are defined and implemented OUTSIDE of this adapter
-        // we will just ignore the linter TypeError because its not real
-		const user: DatabaseUser = { id: session.userId, attributes: { ...data } };
-        worker.close();
+		// attributes are defined and implemented OUTSIDE of this adapter
+		// we will just ignore the linter TypeError because its not real
+		const user: DatabaseUser = {
+			id: session.userId,
+			attributes: { ...data },
+		};
+		worker.close();
 
 		return [session, user];
 	}
@@ -150,5 +158,3 @@ export class RedisAdapter implements Adapter {
 		};
 	}
 }
-
-

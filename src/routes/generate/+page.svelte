@@ -48,11 +48,13 @@
 	};
 
 	const increaseGridsize = () => {
-		userRows += 1;
+		userRows = userRows + 1;
+        rows = getRowData();
 	};
 
 	const decreaseGridsize = () => {
-		userRows -= 1;
+		userRows = userRows - 1;
+        rows = getRowData();
 	};
 
 	const updateRecaps = () => {

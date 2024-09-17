@@ -12,19 +12,18 @@ export const load: PageServerLoad = async ({ locals }) => {
 		redirect(307, '/');
 	}
 
-    const { display_name } = locals.user;
-    const worker = new RedisCacheWorker({});
-    const cached: CacheData | null = await worker.readData(userId);
+	const { display_name } = locals.user;
+	const worker = new RedisCacheWorker({});
+	const cached: CacheData | null = await worker.readData(userId);
 
-    worker.close();
-
+	worker.close();
 
 	if (!cached) {
-		// this is probably either manual navigation to this page
-		// or the result of an error (DB??)
+		// this is probably either a user manually navigating to this page,
+		// or the result of a caching issue
 		return;
 	}
-    const { following, subscriptions, recaps } = cached.data;
+	const { following, subscriptions, recaps } = cached.data;
 
 	return {
 		display_name,

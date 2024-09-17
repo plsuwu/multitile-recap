@@ -154,11 +154,10 @@ export interface RecapsQueryResponse {
 }
 
 export interface CacheData {
-    id: string;
-    data: {
-        following: string;
-        subscriptions: string;
-        recaps: string;
-    };
+	id: string;
+	data: {
+		following: string;
+		subscriptions: string;
+		recaps: string;
+	};
 }
-

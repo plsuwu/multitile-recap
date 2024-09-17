@@ -24,7 +24,6 @@ const buildAuthorizedHeader = (
 
 	if (exHeaderArgs) {
 		Object.entries(exHeaderArgs).forEach(([key, value]) => {
-			// console.log(key, value);
 			headers.append(key, value);
 		});
 	}

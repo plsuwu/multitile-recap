@@ -4,6 +4,7 @@ import { TWITCH_CLIENT_ID } from '$env/static/private';
 
 const TWITCH_OAUTH_REVOKE = 'https://id.twitch.tv/oauth2/revoke';
 
+// todo
 export async function GET(event: RequestEvent): Promise<Response> {
 	const sessionId = event.cookies.get(lucia.sessionCookieName);
 	const access = event.locals.user?.access;
