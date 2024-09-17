@@ -1,49 +1,13 @@
-import { getCachedSubscriptionData } from '@/lib/server/auth';
 import type { PageServerLoad } from './$types';
-interface UserPageData {
-	twitchId: string;
-	login: string;
-	displayName: string;
-	profileImageUrl: string;
-	ttvAccess: string;
-	ttvRefresh: string;
-}
+import { redirect } from '@sveltejs/kit';
 
-interface RequestHasErrorData {
-    error: {
-        where: string;
-        why: string;
-    };
-}
+export const load: PageServerLoad = async ({ locals }) => {
+	if (!locals.user) return null;
 
-export const load: PageServerLoad = async (
-	event
-): Promise<UserPageData | RequestHasErrorData | null> => {
-	const user = event.locals.user;
-
-    // const hasError = event.cookies.get('error');
-    // if (hasError) {
-    //     const [where, why] = hasError.split('::');
-    //     console.log(where, why);
-    //
-    //     return {
-    //         error: {
-    //             where: where,
-    //             why: why
-    //         }
-    //     };
-    // }
-
-	if (!user) {
-		return null;
-	}
+	const { display_name, profile_image_url } = locals.user;
 
 	return {
-		twitchId: user.twitch_id,
-		login: user.login,
-		displayName: user.display_name,
-		profileImageUrl: user.profile_image_url,
-		ttvAccess: user.access,
-		ttvRefresh: user.refresh
+		display_name,
+		profile_image_url,
 	};
 };

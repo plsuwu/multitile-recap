@@ -1,34 +1,50 @@
 <script lang="ts">
-	import HLink from '@/components/HLink.svelte';
-	import Error from '@/components/Error.svelte';
 	import { page } from '$app/stores';
+	import { dev } from '$app/environment';
+	// console.log($page);
 
-	let where = '';
-	let why = '';
-
-	if ($page.data.error && $page.data.error.where && $page.data.error.why) {
-		where = $page.data.error.where;
-		why = $page.data.error.why;
-	}
+	const { display_name, profile_image_url } = $page.data;
 </script>
 
-<div>
-	<!-- {#if where !== '' && why !== ''} -->
-	<!-- 	<Error {where} {why} /> -->
-	<!-- {/if} -->
+<!-- <a -->
+<!-- 	class="rounded border p-0.5 transition-colors duration-100 hover:bg-black/20" -->
+<!-- 	href="/api/test">test cache worker</a -->
+<!-- > -->
+<!---->
 
-	{#if $page.data.displayName}
-		 <div class='flex flex-col items-center justify-center'>
-			<div class='my-2 text-xl'>omg {$page.data.displayName} hiii</div>
-			<img src={$page.data.profileImageUrl} alt="user profile" />
+{#if $page.data.display_name && $page.data.profile_image_url}
+	<div class="flex h-screen w-screen flex-col items-center justify-center">
+		<div class="my-2">
+			<div>
+				omg <span class="rounded-xl bg-black/25 px-2 text-xl"
+					>@{display_name}</span
+				> hiii
+			</div>
 		</div>
-		<div class="flex flex-col my-4">
-			<HLink href={`/logout?t=${$page.data.access}`} text={'<- sign out'} />
-			<HLink href={`/follows`} text={'generate ->'} />
-		</div>
-	{:else}
-		<div></div>
-
-		<HLink href={'/auth'} text={'auth with twitch ->'} />
-	{/if}
-</div>
+		<img
+			src={profile_image_url}
+			alt="user profile"
+			class="size-52 rounded-full"
+		/>
+		<a
+			href="/api/generate"
+			class="mt-14 transition-opacity duration-100 hover:opacity-55"
+			>recaps {'->'}</a
+		>
+	</div>
+{:else}
+	<div
+		class="flex h-screen w-screen flex-row items-center justify-center text-2xl"
+	>
+		<div>[</div>
+		<!-- <div class="flex flex-col items-center"> -->
+		<a
+			href="/api/login"
+			class="text-semibold transition-opacity duration-200 hover:opacity-25"
+			>auth w/ <span class="text-[#a970ff]">twitch.tv</span> {'->'}</a
+		>
+		<!-- <div>{':)'}</div> -->
+		<!-- </div> -->
+		<div>]</div>
+	</div>
+{/if}
