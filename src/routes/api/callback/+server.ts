@@ -7,7 +7,7 @@ import { generateIdFromEntropySize } from 'lucia';
 
 const HELIX = {
 	USER: 'https://api.twitch.tv/helix/users',
-	MOCK: 'http://localhost:8080/users',
+    COLOR: 'https://api.twitch.tv/helix/chat/color',
 };
 
 interface TwitchUser {
@@ -16,6 +16,7 @@ interface TwitchUser {
 	login: string;
 	display_name: string;
 	profile_image_url: string;
+    color: string;
 	access: string;
 	refresh: string;
 	refresh_after: number;
@@ -27,7 +28,7 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
 	const storedState = event.cookies.get('oauth_state') ?? null;
 
 	if (!code || !state || !storedState || state !== storedState) {
-        // handled in '+error.svelte', we can reformat the page & the
+        // handled in '+error.svelte', we can reformat the page with some better
         // error handling later
 		return new Response(null, {
 			status: 400,
@@ -38,6 +39,7 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
 	try {
 		let tokens = await twitch.validateAuthorizationCode(code);
 		const headers = buildAuthorizedHeader(tokens.accessToken);
+        // console.log(tokens.accessToken);
 
 		const userRequest = await fetch(HELIX.USER, {
 			headers: headers,
@@ -48,8 +50,16 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
 		const exists = await worker.readUser<TwitchUser>(twitchUser.id);
 
 		if (!exists) {
-			const userId = generateIdFromEntropySize(10); // 16 chars
+			const userId = generateIdFromEntropySize(10); // 16 chars; locally stored user ref id
 			const { id, login, display_name, profile_image_url } = twitchUser;
+            const userColorRequest = await fetch(`${HELIX.COLOR}?user_id=${id}`, {
+                headers: headers,
+            });
+
+            const userColorResponse = await userColorRequest.json();
+            const color = userColorResponse.data[0].color;
+            // console.log(color);
+
 
 			const cachedUser = {
 				id: userId, // lucia token - referenced in client cookies
@@ -57,6 +67,7 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
 				login,
 				display_name,
 				profile_image_url,
+                color,
 				access: tokens.accessToken,
 				refresh: tokens.refreshToken,
 				refresh_after:

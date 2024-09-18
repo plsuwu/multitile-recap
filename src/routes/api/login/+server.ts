@@ -7,9 +7,8 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
 	const state = generateState();
 	const scopes = {
 		scopes: [
-			'user:read:follows',
-			'user:read:subscriptions',
-			'user:read:email',
+            'user:read:follows',
+            'user:read:subscriptions',
 		],
 	};
 

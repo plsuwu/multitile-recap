@@ -12,19 +12,28 @@ export const load: PageServerLoad = async ({ locals }) => {
 		redirect(307, '/');
 	}
 
-	const { display_name } = locals.user;
-	const worker = new RedisCacheWorker({});
-	const cached: CacheData | null = await worker.readData(userId);
+    const { display_name } = locals.user;
+    const worker = new RedisCacheWorker({});
 
-	worker.close();
+    const hasAuth = await worker.readTempAuth(userId);
+    const hasData = await worker.readData<CacheData>(userId);
 
-	if (!cached) {
+	if (!hasData || !hasData.data.recaps) {
+        console.error('[!] No recap data in cache.');
 		// this is probably either a user manually navigating to this page,
 		// or the result of a caching issue
-		return;
+        await worker.deleteAuth(userId);
+        worker.close();
+        redirect(307, '/?e=invalid_token');
 	}
-	const { following, subscriptions, recaps } = cached.data;
+	const { following, subscriptions, recaps } = hasData.data;
 
+    if (following && subscriptions && recaps && hasAuth) {
+        console.warn('[*] Recaps data ok - purging global auth.');
+        await worker.deleteAuth(userId);
+    }
+
+    worker.close();
 	return {
 		display_name,
 		subs: JSON.parse(subscriptions),
