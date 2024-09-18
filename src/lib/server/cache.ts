@@ -32,6 +32,10 @@ class RedisCacheWorker {
 		return `data:${id}`;
 	}
 
+    private getAuthKey(id: string | number): string {
+        return `auth:${id}`;
+    }
+
 	async readUser<T>(id: string | number): Promise<T | null> {
 		const key = this.getUserKey(id);
 		const user = await this.client.hGetAll(key);
@@ -52,11 +56,27 @@ class RedisCacheWorker {
 		return JSON.parse(data.data) as T;
 	}
 
+    async readTempAuth(id: string): Promise<string | null> {
+        const key = this.getAuthKey(id);
+        const auth = await this.client.get(key);
+        if (!auth || typeof auth !== typeof '') {
+            return null;
+        }
+
+        return auth;
+    }
+
+    async writeTempAuth(id: string, auth: string): Promise<void> {
+        const key = this.getAuthKey(id);
+        await this.client.set(key, auth, {
+            EX: this.ttl,
+        });
+    }
+
 	async writeUser<T>(id: string | number, data: T): Promise<void> {
 		const key = this.getUserKey(id);
 		await this.client.hSet(key, {
 			data: JSON.stringify(data),
-			EX: this.ttl,
 		});
 	}
 
@@ -64,7 +84,6 @@ class RedisCacheWorker {
 		const key = this.getDataKey(id);
 		await this.client.hSet(key, {
 			data: JSON.stringify(data),
-			EX: this.ttl,
 		});
 	}
 
@@ -77,6 +96,11 @@ class RedisCacheWorker {
 		const key = this.getUserKey(id);
 		await this.client.del(key);
 	}
+
+    async deleteAuth(id: string | number) {
+        const key = this.getAuthKey(id);
+        await this.client.del(key);
+    }
 
 	async close(): Promise<void> {
 		await this.client.quit();

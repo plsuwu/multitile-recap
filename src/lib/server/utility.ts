@@ -1,34 +1,31 @@
 import {
-	TWITCH_CLIENT_ID,
-	TWITCH_CLIENT_GQL_HARDCODED,
+    TWITCH_CLIENT_ID,
 } from '$env/static/private';
 
 const buildAuthorizedHeader = (
-	token: string,
-	useOAuth: boolean = false,
-	useCustomAgent: boolean = false,
-	exHeaderArgs: Record<string, string> | null = null
+    token: string,
+    useOAuth: boolean = false,
+    useCustomAgent: boolean = false,
+    clientType: string = TWITCH_CLIENT_ID,
+    exHeaderArgs: Record<string, string>[] | null = null
 ): Headers => {
-	const headerType = useOAuth ? 'OAuth' : 'Bearer';
-	const agent =
-		'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36';
+    const headerType = useOAuth ? 'OAuth' : 'Bearer';
+    const headers: Headers = new Headers({
+        Authorization: `${headerType} ${token}`,
+        'client-id': clientType,
+    });
 
-	const headers: Headers = new Headers({
-		Authorization: `${headerType} ${token}`,
-		'Client-Id': TWITCH_CLIENT_ID,
-	});
 
-	if (useCustomAgent) {
-		headers.append('User-Agent', agent);
-	}
+    if (exHeaderArgs) {
+        exHeaderArgs.forEach((head) => {
+            Object.entries(head).forEach(([key, value]) => {
+                headers.append(key, value);
+            });
+        });
+    }
 
-	if (exHeaderArgs) {
-		Object.entries(exHeaderArgs).forEach(([key, value]) => {
-			headers.append(key, value);
-		});
-	}
-
-	return headers;
+    // console.log(headers);
+    return headers;
 };
 
 export { buildAuthorizedHeader };

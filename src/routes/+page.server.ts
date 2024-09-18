@@ -1,13 +1,17 @@
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad, RequestEvent } from './$types';
 import { redirect } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async (event: RequestEvent) => {
+    const { locals } = event;
 	if (!locals.user) return null;
 
-	const { display_name, profile_image_url } = locals.user;
+    const e = event.url.searchParams.get('e');
+	const { display_name, profile_image_url, color } = locals.user;
 
 	return {
 		display_name,
 		profile_image_url,
+        color,
+        e,
 	};
 };

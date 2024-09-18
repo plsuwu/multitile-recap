@@ -80,7 +80,8 @@
 	{decreaseGridsize}
 />
 <div class="flex flex-col">
-	<div class="my-6 flex w-full flex-row justify-between">
+	<div class="my-6 flex w-full flex-row justify-center">
+    <div class='inline-flex justify-around justify-self-center w-1/3'>
 		<a
 			href="/"
 			class="self-start transition-opacity duration-100 hover:opacity-55"
@@ -91,6 +92,7 @@
 			class="self-end italic opacity-55 transition-opacity duration-100 hover:opacity-100"
 			on:click={toggleModal}>options</button
 		>
+ </div>
 	</div>
 	<div class="flex flex-col">
 		{#key usingRecaps || userRows}
