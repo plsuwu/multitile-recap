@@ -166,6 +166,6 @@ export interface CacheData {
 	data: {
 		following: FollowsData[];
 		subscriptions: UserSubscriptions[];
-		recaps: RecapsQueryResponse[];
+		recaps: RecapsQueryResponse[] | null;
 	};
 }

@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 
 	const { display_name, profile_image_url, color } = $page.data;
-    const e = $page.url.searchParams.get('e');
+	const e = $page.url.searchParams.get('e');
 
 	function getRgba(color: string) {
 		const hex = color.slice(1);
@@ -33,26 +33,20 @@
 	const formattedColor = color ? getRgba(color) : { bg: '#FFF', fg: '#000' };
 </script>
 
-<!-- <a -->
-<!-- 	class="rounded border p-0.5 transition-colors duration-100 hover:bg-black/20" -->
-<!-- 	href="/api/test">test cache worker</a -->
-<!-- > -->
-<!---->
-
 {#if $page.data.display_name && $page.data.profile_image_url}
 	<div
 		class="flex h-screen w-screen flex-col items-center justify-center text-lg"
 	>
-			{#if e && e === 'invalid_token'}
-			<div class="text-center font-bold text-red-700 text-base my-4">
+		{#if e && e === 'invalid_token'}
+			<div class="my-4 text-center text-base font-bold text-red-700">
 				The Authentication token for the recaps endpoint was rejected by
 				Twitch's server.
-                <br/>
-                Please hit recaps and double check that you are providing the correct
-                token.
+				<br />
+				Please hit recaps and double check that you are providing the correct
+				token.
 			</div>
-			{/if}
-            <div class="mb-12">
+		{/if}
+		<div class="mb-12">
 			<div class="text-center">
 				omg <span
 					class="rounded-xl px-2 text-2xl"
@@ -78,19 +72,17 @@
 		>
 		<a
 			href="/api/logout"
-			class="mt-6 mb-14 transition-opacity duration-100 hover:opacity-55"
+			class="mb-14 mt-6 transition-opacity duration-100 hover:opacity-55"
 			>{'<-'} logout</a
 		>
-
 	</div>
 {:else}
 	<div
 		class="flex h-screen w-screen flex-row items-center justify-center text-2xl"
 	>
 		<div class="flex flex-col text-center">
-			<div class="flex flex-row text-center justify-center my-4">
+			<div class="my-4 flex flex-row justify-center text-center">
 				<div>[</div>
-				<!-- <div class="flex flex-col items-center"> -->
 				<a
 					href="/api/login"
 					class="text-semibold transition-opacity duration-200 hover:opacity-25"

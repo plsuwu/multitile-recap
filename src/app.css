@@ -3,7 +3,7 @@
 @tailwind components;
 
 @layer base {
-    body {
-        overflow-y: scroll;
-    }
+	body {
+		overflow-y: scroll;
+	}
 }

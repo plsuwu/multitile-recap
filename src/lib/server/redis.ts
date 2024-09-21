@@ -23,7 +23,7 @@ interface CachedUserAttributes {
 	login: string;
 	display_name: string;
 	profile_image_url: string;
-    color: string;
+	color: string;
 	access: string;
 	refresh: string;
 	refresh_after: string;

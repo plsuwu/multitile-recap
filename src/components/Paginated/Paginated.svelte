@@ -1,14 +1,45 @@
 <script lang="ts">
 	import { currentPage } from '$lib/stores';
 	import { paginate, formatIndex } from '@components/Paginated/utils';
+	import dayjs from 'dayjs';
+	import duration from 'dayjs/plugin/duration';
+	import relativeTime from 'dayjs/plugin/relativeTime';
 	import type { FollowsData, UserSubscriptions } from '$lib/types';
 	import PageNums from '@components/Paginated/PageNums.svelte';
 	import AccordionList from '@components/Accordion/AccordionList.svelte';
 	import AccordionBlank from '@components/Accordion/AccordionBlank.svelte';
 
+	dayjs.extend(duration);
+	dayjs.extend(relativeTime);
+
 	export let following: FollowsData[];
 	export let subscriptions: UserSubscriptions[];
-	// export let subIcons: { broadcaster_name: string; badge_url: string }[];
+
+	function followAge(date: string) {
+		const followed = dayjs(date);
+		const curr = dayjs();
+
+		const diff = curr.diff(followed);
+		const duration = dayjs.duration(diff);
+
+		const mins = duration.minutes();
+		const hours = duration.hours();
+		const days = duration.days();
+		const months = duration.months();
+		const years = duration.years();
+
+		if (years > 0) {
+			return `${years} years, ${months} months, ${days} days, ${hours} hours, ${mins} minutes`;
+		} else if (months > 0) {
+			return `${months} months, ${days} days, ${hours} hours, ${mins} minutes`;
+		} else if (days > 0) {
+			return `${days} days, ${hours} hours, ${mins} minutes`;
+		} else if (hours > 0) {
+			return `${hours} hours, ${mins} minutes`;
+		} else {
+			return `${mins} minutes`;
+		}
+	}
 
 	function subscribed(b: string) {
 		return subscriptions.some((i) => i.broadcaster_name === b);
@@ -72,18 +103,28 @@
 								{broadcaster.broadcaster_name}
 								{#if subscribed(broadcaster.broadcaster_name)}
 									<div
-										class="font-mono text-xs text-blue-600 inline-flex flex-row"
+										class="inline-flex flex-row font-mono text-xs text-blue-600"
 									>
 										[**]
 									</div>
 								{:else}
-									<div class="font-mono text-xs invisible inline-flex flex-row items-center justify-items-center">
+									<div
+										class="invisible inline-flex flex-row items-center justify-items-center font-mono text-xs"
+									>
 										[**]
 									</div>
 								{/if}
 							</div>
 						</div>
-						<div slot="details">Following since {new Date(broadcaster.followed_at).toLocaleString()}</div>
+						<div slot="details">
+							Following for {followAge(broadcaster.followed_at)}
+
+							<div>
+								(since {new Date(
+									broadcaster.followed_at
+								).toLocaleString()})
+							</div>
+						</div>
 					</AccordionList>
 				{/if}
 			{/each}

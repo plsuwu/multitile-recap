@@ -26,7 +26,7 @@ export const lucia = new Lucia(adapter, {
 			login: attr.login,
 			display_name: attr.display_name,
 			profile_image_url: attr.profile_image_url,
-            color: attr.color,
+			color: attr.color,
 			access: attr.access,
 			refresh: attr.refresh,
 			refresh_after: attr.refresh_after,
@@ -43,7 +43,7 @@ declare module 'lucia' {
 			login: string;
 			display_name: string;
 			profile_image_url: string;
-            color: string;
+			color: string;
 			access: string;
 			refresh: string;
 			refresh_after: string;

@@ -6,9 +6,8 @@
 
 	const recaps = $page.data.recaps;
 	let filtered: (string | undefined)[] = [];
-	let usingRecaps: RecapsQueryResponse[] = (recaps)
+	let usingRecaps: RecapsQueryResponse[] = recaps
 		.map((recap: any) => {
-            console.log(recap);
 			if (recap.data.user.self.recap.minutesWatched !== '0') {
 				return recap;
 			} else {
@@ -50,16 +49,16 @@
 
 	const increaseGridsize = () => {
 		userRows = userRows + 1;
-        rows = getRowData();
+		rows = getRowData();
 	};
 
 	const decreaseGridsize = () => {
 		userRows = userRows - 1;
-        rows = getRowData();
+		rows = getRowData();
 	};
 
 	const updateRecaps = () => {
-		usingRecaps = (recaps)
+		usingRecaps = recaps
 			.map((recap: any) => {
 				if (!filtered.includes(recap.data.channel.displayName)) {
 					return recap;
@@ -82,18 +81,18 @@
 />
 <div class="flex flex-col">
 	<div class="my-6 flex w-full flex-row justify-center">
-    <div class='inline-flex justify-around justify-self-center w-1/3'>
-		<a
-			href="/"
-			class="self-start transition-opacity duration-100 hover:opacity-55"
-		>
-			{'<-'} back
-		</a>
-		<button
-			class="self-end italic opacity-55 transition-opacity duration-100 hover:opacity-100"
-			on:click={toggleModal}>options</button
-		>
- </div>
+		<div class="inline-flex w-1/3 justify-around justify-self-center">
+			<a
+				href="/"
+				class="self-start transition-opacity duration-100 hover:opacity-55"
+			>
+				{'<-'} back
+			</a>
+			<button
+				class="self-end italic opacity-55 transition-opacity duration-100 hover:opacity-100"
+				on:click={toggleModal}>options</button
+			>
+		</div>
 	</div>
 	<div class="flex flex-col">
 		{#key usingRecaps || userRows}
