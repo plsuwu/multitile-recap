@@ -4,11 +4,12 @@
 	import Card from '@components/Card/Card.svelte';
 	import Modal from '@components/Modal/Modal.svelte';
 
-	const recaps: RecapsQueryResponse[] = $page.data.recaps;
+	const recaps = $page.data.recaps;
 	let filtered: (string | undefined)[] = [];
-	let usingRecaps: RecapsQueryResponse[] = recaps
-		.map((recap) => {
-			if (recap.data.user.self.recap.minutesWatched !== '') {
+	let usingRecaps: RecapsQueryResponse[] = (recaps)
+		.map((recap: any) => {
+            console.log(recap);
+			if (recap.data.user.self.recap.minutesWatched !== '0') {
 				return recap;
 			} else {
 				filtered.push(recap.data.channel.displayName);
@@ -58,13 +59,13 @@
 	};
 
 	const updateRecaps = () => {
-		usingRecaps = recaps
-			.map((recap) => {
+		usingRecaps = (recaps)
+			.map((recap: any) => {
 				if (!filtered.includes(recap.data.channel.displayName)) {
 					return recap;
 				}
 			})
-			.filter(Boolean) as RecapsQueryResponse[];
+			.filter(Boolean);
 
 		rows = getRowData();
 	};

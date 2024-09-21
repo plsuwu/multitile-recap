@@ -36,8 +36,8 @@ export const load: PageServerLoad = async ({ locals }) => {
     worker.close();
 	return {
 		display_name,
-		subs: JSON.parse(subscriptions),
-		follows: JSON.parse(following),
-		recaps: JSON.parse(recaps),
+		subs: subscriptions,
+		follows: following,
+		recaps: recaps,
 	};
 };

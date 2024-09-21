@@ -1,4 +1,12 @@
 /* ---------------- HELIX -------------------- */
+
+export interface FollowsData {
+	broadcaster_id: string;
+	broadcaster_login: string;
+	broadcaster_name: string;
+	followed_at: string;
+}
+
 export interface FollowsResponse {
 	data: Array<{
 		broadcaster_id: string;
@@ -156,8 +164,8 @@ export interface RecapsQueryResponse {
 export interface CacheData {
 	id: string;
 	data: {
-		following: string;
-		subscriptions: string;
-		recaps: string;
+		following: FollowsData[];
+		subscriptions: UserSubscriptions[];
+		recaps: RecapsQueryResponse[];
 	};
 }

@@ -2,9 +2,13 @@ import { redirect, type RequestEvent } from '@sveltejs/kit';
 import { testCacheRw } from '@server/tests';
 
 export async function GET(event: RequestEvent): Promise<Response> {
-    if (!import.meta.env.PROD) {
-	    testCacheRw();
-    }
-
-	redirect(302, '/');
+ //    if (!import.meta.env.PROD) {
+	//     testCacheRw();
+ //    }
+	//
+	// redirect(302, '/');
+    //
+    return new Response(null, {
+        status: 200,
+    })
 }

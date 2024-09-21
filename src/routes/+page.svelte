@@ -69,6 +69,11 @@
 		<a
 			href="/api/generate"
 			class="mt-14 transition-opacity duration-100 hover:opacity-55"
+			>{'following & subs ->'}</a
+		>
+		<a
+			href="/api/generate?wants=true"
+			class="mt-2 transition-opacity duration-100 hover:opacity-55"
 			>recaps {'->'}</a
 		>
 		<a

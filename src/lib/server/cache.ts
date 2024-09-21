@@ -39,21 +39,22 @@ class RedisCacheWorker {
 	async readUser<T>(id: string | number): Promise<T | null> {
 		const key = this.getUserKey(id);
 		const user = await this.client.hGetAll(key);
-		if (typeof user.data === typeof Object.create(null).data) {
+		if (typeof user.cached === typeof Object.create(null).cached) {
 			return null;
 		}
 
-		return JSON.parse(user.data) as T;
+		return JSON.parse(user.cached) as T;
 	}
 
 	async readData<T>(id: string): Promise<T | null> {
 		const key = this.getDataKey(id);
 		const data = await this.client.hGetAll(key);
-		if (typeof data.data === typeof Object.create(null).data) {
+
+		if (typeof data.cached === typeof Object.create(null).cached) {
 			return null;
 		}
 
-		return JSON.parse(data.data) as T;
+	    return JSON.parse(data.cached) as T;
 	}
 
     async readTempAuth(id: string): Promise<string | null> {
@@ -69,21 +70,21 @@ class RedisCacheWorker {
     async writeTempAuth(id: string, auth: string): Promise<void> {
         const key = this.getAuthKey(id);
         await this.client.set(key, auth, {
-            EX: this.ttl,
+            EX: 120,
         });
     }
 
 	async writeUser<T>(id: string | number, data: T): Promise<void> {
 		const key = this.getUserKey(id);
 		await this.client.hSet(key, {
-			data: JSON.stringify(data),
+			cached: JSON.stringify(data),
 		});
 	}
 
-	async writeData<T>(id: string | number, data: T): Promise<void> {
+	async writeData<T extends Record<string, any>>(id: string | number, data: T): Promise<void> {
 		const key = this.getDataKey(id);
 		await this.client.hSet(key, {
-			data: JSON.stringify(data),
+			cached: JSON.stringify(data),
 		});
 	}
 
@@ -96,6 +97,14 @@ class RedisCacheWorker {
 		const key = this.getUserKey(id);
 		await this.client.del(key);
 	}
+
+    async purgeUser(id: string | number): Promise<void> {
+		const userKey = this.getUserKey(id);
+        const dataKey = this.getDataKey(id);
+
+        await this.client.del(userKey);
+        await this.client.del(dataKey);
+    }
 
     async deleteAuth(id: string | number) {
         const key = this.getAuthKey(id);
