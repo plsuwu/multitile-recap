@@ -11,7 +11,7 @@
 	export let increaseGridsize: () => void;
 	export let decreaseGridsize: () => void;
 
-	let channels = recaps.map((recap) => recap.data.channel.displayName);
+	let channels = recaps.map((recap: any) => recap.data.channel.displayName);
 </script>
 
 <div
