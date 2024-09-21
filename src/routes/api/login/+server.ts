@@ -6,10 +6,7 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
 	// debugging
 	const state = generateState();
 	const scopes = {
-		scopes: [
-            'user:read:follows',
-            'user:read:subscriptions',
-		],
+		scopes: ['user:read:follows', 'user:read:subscriptions'],
 	};
 
 	const url = await twitch.createAuthorizationURL(state, scopes);

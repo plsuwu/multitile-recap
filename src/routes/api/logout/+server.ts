@@ -1,21 +1,21 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { lucia } from '$lib/server/auth';
 import { TWITCH_CLIENT_ID } from '$env/static/private';
+import RedisCacheWorker from '@server/cache';
 
 const TWITCH_OAUTH_REVOKE = 'https://id.twitch.tv/oauth2/revoke';
-
-// todo
 export async function GET(event: RequestEvent): Promise<Response> {
 	const sessionId = event.cookies.get(lucia.sessionCookieName);
+	const userId = event.locals.user?.id;
 	const access = event.locals.user?.access;
 
-	if (!sessionId || !access) {
+	if (!sessionId || !access || !userId) {
 		console.log(
 			'[!] Unable to correctly determine data to revoke:',
-			'sessionId ->',
+			'session ->',
 			sessionId,
-			'access ->',
-			access
+			'w/ lucia userId ->',
+			userId
 		);
 
 		return new Response(null, {
@@ -26,6 +26,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		});
 	}
 
+	const worker = new RedisCacheWorker({});
 	try {
 		const revoke = await fetch(TWITCH_OAUTH_REVOKE, {
 			method: 'POST',
@@ -52,12 +53,13 @@ export async function GET(event: RequestEvent): Promise<Response> {
 
 				default:
 					console.error(
-						'[!] Twitch returned an undocumented status.'
+						'[!] Twitch returned an undocumented response status.'
 					);
 					break;
 			}
 		} else {
-			console.log('[+] Token revoked successfully.');
+			await worker.delete(userId);
+			console.log('[+] Token revocation + cache flush ok');
 		}
 
 		await lucia.invalidateSession(sessionId);
@@ -67,8 +69,6 @@ export async function GET(event: RequestEvent): Promise<Response> {
 				Location: '/',
 			},
 		});
-
-		// handle (report) issues we cause
 	} catch (err) {
 		console.log('[!] Unable to revoke token:', err);
 		return new Response(null, {

@@ -13,10 +13,9 @@
 		let res = '';
 
 		if (days > 0) res += `${days}d `;
-
 		if (hours > 0) res += `${hours}h `;
-
 		if (mins > 0 && days <= 0) res += `${mins}m `;
+		else if (mins == 0) res += '0m';
 
 		return res.trim();
 	};

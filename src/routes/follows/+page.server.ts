@@ -1,34 +1,38 @@
-import { redirect } from "@sveltejs/kit";
-import type { PageServerLoad, RequestEvent } from "./$types";
-import RedisCacheWorker from "@server/cache";
-import type { CacheData, SubscriptionsResponse, UserSubscriptions } from "@/lib/types";
+import { redirect } from '@sveltejs/kit';
+import type { PageServerLoad, RequestEvent } from './$types';
+import RedisCacheWorker from '@server/cache';
+import type {
+	CacheData,
+	SubscriptionsResponse,
+	UserSubscriptions,
+} from '@/lib/types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-    const access = locals.user?.access;
-    const twitchId = locals.user?.twitch_id;
-    const userId = locals.user?.id;
+	const access = locals.user?.access;
+	const twitchId = locals.user?.twitch_id;
+	const userId = locals.user?.id;
 
-    const sessionId = locals.session?.id;
+	const sessionId = locals.session?.id;
 
-    if (!access || !sessionId || !twitchId || !userId) {
-        redirect(307, '/');
-    }
+	if (!access || !sessionId || !twitchId || !userId) {
+		redirect(307, '/');
+	}
 
-    const worker = new RedisCacheWorker({});
-    const cached = await worker.readData<CacheData>(userId);
-    worker.close();
+	const worker = new RedisCacheWorker({});
+	const cached = await worker.readData<CacheData>(userId);
+	worker.close();
 
-    if (!cached || !cached.data || !cached.data.following) {
-        console.error('[!] Missing or invalid data in cache.');
+	if (!cached || !cached.data || !cached.data.following) {
+		console.error('[!] Missing or invalid data in cache.');
 
-        // hgandle but forreal another time
-        redirect(300, '/');
-    }
+		// hgandle but forreal another time
+		redirect(300, '/');
+	}
 
-    const { following, subscriptions } = cached.data
+	const { following, subscriptions } = cached.data;
 
-    return {
-        subscriptions,
-        following,
-    };
+	return {
+		subscriptions,
+		following,
+	};
 };

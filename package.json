@@ -46,6 +46,7 @@
 	"dependencies": {
 		"arctic": "^1.9.2",
 		"better-sqlite3": "^11.3.0",
+		"dayjs": "^1.11.13",
 		"lucia": "^3.2.0",
 		"redis": "^4.7.0"
 	}

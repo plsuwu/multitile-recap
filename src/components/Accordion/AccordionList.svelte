@@ -9,14 +9,13 @@
 </script>
 
 <div class="my-0.5 flex w-full flex-col">
-	<div class="xl:w-8/12 w-full items-center self-center">
+	<div class="w-full items-center self-center xl:w-8/12">
 		<button
 			class={`flex w-full flex-row items-center self-center rounded-md border border-black/25 font-semibold transition-all duration-200 hover:brightness-50 ${index % 2 === 0 ? 'bg-gray-400/50' : 'hover:bg-gray-400/50'}`}
 			on:click={toggle}
 		>
 			<div class="flex w-full justify-between">
-				<slot name="title">
-                </slot>
+				<slot name="title"></slot>
 				<div class="flex flex-row align-middle font-mono">
 					<div>[</div>
 					{#if open}

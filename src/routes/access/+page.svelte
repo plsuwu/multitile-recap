@@ -15,7 +15,6 @@
 	function mkRandChars(len: number = 30) {
 		const charset = 'abcdefghijklmnopqrstuvwxyz0123456789';
 		let res = '';
-
 		for (let i = 0; i < len; i++) {
 			const n = Math.floor(Math.random() * charset.length);
 			res += charset.charAt(n);
@@ -25,34 +24,25 @@
 	}
 
 	async function parseToken() {
-        if (error.error) {
-            error.error = false;
-            error.reason = '';
-        }
+		// clear the existing error if is set
+		if (error.error) {
+			error.error = false;
+			error.reason = '';
+		}
 
 		let body: string;
-
 		if (input.toLowerCase().includes('oauth ')) {
 			const t = input.toLowerCase().split('oauth ')[1];
-
 			if (!t || t.length !== 30) {
-				error = {
-					error: true,
-					reason: `Invalid OAuth token.`,
-				};
+				error = { error: true, reason: `Invalid OAuth token.` };
 				return;
 			}
-
 			body = t;
 		} else {
 			if (!input || input.length !== 30) {
-				error = {
-					error: true,
-					reason: `Invalid OAuth token.`,
-				};
+				error = { error: true, reason: `Invalid OAuth token.` };
 				return;
 			}
-
 			body = input;
 		}
 
@@ -71,13 +61,14 @@
 				Accept: 'application/json',
 				'Content-Type': 'application/json',
 			},
+
 			body: JSON.stringify({ token: body, user: $page.data.user }),
 		});
 
 		if (!res.ok) {
 			error = {
 				error: true,
-				reason: 'OAuth token seems invalid',
+				reason: 'OAuth token seems invalid for this account.',
 			};
 		} else {
 			authOkay = true;
@@ -144,14 +135,13 @@
 					</div>
 				{/if}
 				{#if authOkay}
-
-				<div class="my-2 text-center text-blue-400">
-					<a
-						href="/api/generate?wants=true"
-						class="transition-opacity duration-100 hover:opacity-55"
-						>generate recaps {'->'}</a
-					>
-                </div>
+					<div class="my-2 text-center text-blue-400">
+						<a
+							href="/api/generate?wants=true"
+							class="transition-opacity duration-100 hover:opacity-55"
+							>generate recaps {'->'}</a
+						>
+					</div>
 				{/if}
 			{/key}
 		</div>

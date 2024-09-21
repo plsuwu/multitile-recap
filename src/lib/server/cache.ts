@@ -32,9 +32,9 @@ class RedisCacheWorker {
 		return `data:${id}`;
 	}
 
-    private getAuthKey(id: string | number): string {
-        return `auth:${id}`;
-    }
+	private getAuthKey(id: string | number): string {
+		return `auth:${id}`;
+	}
 
 	async readUser<T>(id: string | number): Promise<T | null> {
 		const key = this.getUserKey(id);
@@ -54,25 +54,25 @@ class RedisCacheWorker {
 			return null;
 		}
 
-	    return JSON.parse(data.cached) as T;
+		return JSON.parse(data.cached) as T;
 	}
 
-    async readTempAuth(id: string): Promise<string | null> {
-        const key = this.getAuthKey(id);
-        const auth = await this.client.get(key);
-        if (!auth || typeof auth !== typeof '') {
-            return null;
-        }
+	async readTempAuth(id: string): Promise<string | null> {
+		const key = this.getAuthKey(id);
+		const auth = await this.client.get(key);
+		if (!auth || typeof auth !== typeof '') {
+			return null;
+		}
 
-        return auth;
-    }
+		return auth;
+	}
 
-    async writeTempAuth(id: string, auth: string): Promise<void> {
-        const key = this.getAuthKey(id);
-        await this.client.set(key, auth, {
-            EX: 120,
-        });
-    }
+	async writeTempAuth(id: string, auth: string): Promise<void> {
+		const key = this.getAuthKey(id);
+		await this.client.set(key, auth, {
+			EX: 120,
+		});
+	}
 
 	async writeUser<T>(id: string | number, data: T): Promise<void> {
 		const key = this.getUserKey(id);
@@ -81,7 +81,10 @@ class RedisCacheWorker {
 		});
 	}
 
-	async writeData<T extends Record<string, any>>(id: string | number, data: T): Promise<void> {
+	async writeData<T extends Record<string, any>>(
+		id: string | number,
+		data: T
+	): Promise<void> {
 		const key = this.getDataKey(id);
 		await this.client.hSet(key, {
 			cached: JSON.stringify(data),
@@ -98,18 +101,18 @@ class RedisCacheWorker {
 		await this.client.del(key);
 	}
 
-    async purgeUser(id: string | number): Promise<void> {
+	async purgeUser(id: string | number): Promise<void> {
 		const userKey = this.getUserKey(id);
-        const dataKey = this.getDataKey(id);
+		const dataKey = this.getDataKey(id);
 
-        await this.client.del(userKey);
-        await this.client.del(dataKey);
-    }
+		await this.client.del(userKey);
+		await this.client.del(dataKey);
+	}
 
-    async deleteAuth(id: string | number) {
-        const key = this.getAuthKey(id);
-        await this.client.del(key);
-    }
+	async deleteAuth(id: string | number) {
+		const key = this.getAuthKey(id);
+		await this.client.del(key);
+	}
 
 	async close(): Promise<void> {
 		await this.client.quit();

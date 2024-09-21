@@ -28,38 +28,44 @@
 			<p class="mb-1 text-base font-semibold">credential storage</p>
 			<p>
 				This application only intends to retain the "legitimate" OAuth
-				tokens (which are scoped to read only following and subscription
-				metrics), alongside the following/subscription/recap data we
-				fetch. We otherwise purge this <samp
+				tokens (which are scoped only to read information about your
+				follows and subscriptions), alongside the associated following,
+				subscription, and recap data we fetch. This is cached until your
+				OAuth token needs to be refreshed. We otherwise purge this <samp
 					class="whitespace-nowrap rounded-xl bg-black/30 px-1 text-xs"
 				>
 					protected_login</samp
-				> token as quickly as is reasonable - either:
+				> token as quickly as reasonably possible, meaning we flush it after
+				either:
 			</p>
 			<ul class="list-inside list-disc flex-col indent-6">
-				<li>an attempt to fetch recap data is made; or,</li>
-				<li>5 minutes has elapsed since the token was cached,</li>
+				<li>An attempt to fetch recap data is made; or,</li>
+				<li>Two minutes has elapsed since the token was submitted,</li>
 			</ul>
-			<p>(whichever comes first).</p>
+			<p>whichever comes first.</p>
 			<div class="my-3 border-b border-black/10"></div>
-			<p class="mb-1 text-base font-semibold">token usage</p>
+			<p class="mb-1 text-base font-semibold">how this token is used</p>
 			<p>
 				Twitch pulls Recap data from <samp
 					class="whitespace-nowrap rounded-xl bg-black/30 px-1 text-xs"
 				>
 					https://gql.twitch.tv/
 				</samp>
-				- there are no available OAuth scopes that facilitate access to a
-				specific field -
+				- though does not provide the correct OAuth scopes to facilitate
+				access to a specific field required to build a subscription recap
+				-
 				<samp
 					class="whitespace-nowrap rounded-xl bg-black/30 px-1 text-xs"
 				>
 					self
-				</samp> - containing per-user details on channel engagement
+				</samp> - which contains user-specific details on monthly channel
+				engagement (i.e, minutes/streamed watched, chats sent, etc). This
+				is obviously integral to generating a recap card grid.
 			</p>
 			<div class="my-3 border-b border-black/10"></div>
 			<p>
-				This application's source code is open and available at
+				If you wish, this application's source code and commit history
+				can be found at
 				<a
 					href="https://github.com/plsuwu/multitile-recap"
 					target="blank"

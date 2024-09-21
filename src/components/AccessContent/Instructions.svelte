@@ -63,8 +63,8 @@
 					> tab, and copy-paste its content into the field above.
 				</li>
 				<li>
-					Hit submit - if all is ok, a 'continue' button should
-					appear.
+					Hit submit - if all is ok, a 'generate recaps' button should
+					appear just below the text input.
 				</li>
 			</ol>
 		</div>

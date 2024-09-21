@@ -12,28 +12,29 @@ export const load: PageServerLoad = async ({ locals }) => {
 		redirect(307, '/');
 	}
 
-    const { display_name } = locals.user;
-    const worker = new RedisCacheWorker({});
+	const { display_name } = locals.user;
+	const worker = new RedisCacheWorker({});
 
-    const hasAuth = await worker.readTempAuth(userId);
-    const hasData = await worker.readData<CacheData>(userId);
+	const hasAuth = await worker.readTempAuth(userId);
+	const hasData = await worker.readData<CacheData>(userId);
 
 	if (!hasData || !hasData.data.recaps) {
-        console.error('[!] No recap data in cache.');
+		console.error('[!] No recap data in cache.');
 		// this is probably either a user manually navigating to this page,
 		// or the result of a caching issue
-        await worker.deleteAuth(userId);
-        worker.close();
-        redirect(307, '/?e=invalid_token');
+		await worker.deleteAuth(userId);
+		await worker.delete(userId);
+		worker.close();
+		redirect(307, '/?e=invalid_token');
 	}
 	const { following, subscriptions, recaps } = hasData.data;
 
-    if (following && subscriptions && recaps && hasAuth) {
-        console.warn('[*] Recaps data ok - purging global auth.');
-        await worker.deleteAuth(userId);
-    }
+	if (following && subscriptions && recaps && hasAuth) {
+		console.warn('[*] Recaps data ok - purging global auth.');
+		await worker.deleteAuth(userId);
+	}
 
-    worker.close();
+	worker.close();
 	return {
 		display_name,
 		subs: subscriptions,

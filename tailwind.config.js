@@ -5,7 +5,7 @@ export default {
 		extend: {
 			fontFamily: {
 				sans: ['Inter'],
-                mono: ['Noto Sans Mono'],
+				mono: ['Noto Sans Mono'],
 			},
 		},
 	},
