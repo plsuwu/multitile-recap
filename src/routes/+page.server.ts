@@ -6,12 +6,13 @@ export const load: PageServerLoad = async (event: RequestEvent) => {
 	if (!locals.user) return null;
 
 	const e = event.url.searchParams.get('e');
-	const { display_name, profile_image_url, color } = locals.user;
+	const { display_name, profile_image_url, color, login } = locals.user;
 
 	return {
 		display_name,
 		profile_image_url,
 		color,
+        login,
 		e,
 	};
 };

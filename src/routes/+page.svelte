@@ -49,9 +49,13 @@
 		<div class="mb-12">
 			<div class="text-center">
 				omg <span
-					class="rounded-xl px-2 text-2xl"
+					class="rounded-xl px-2 text-2xl font-semibold italic hover:brightness-90 transition-all duration-200"
 					style={`color: ${formattedColor.fg}; background-color: ${formattedColor.bg}; background`}
-					>@{display_name}</span
+					><a
+						href={`https://www.twitch.tv/${$page.data.login}`}
+						target="_blank"
+						referrerpolicy="no-referrer">/{display_name}</a
+					></span
 				> hiii
 			</div>
 		</div>
