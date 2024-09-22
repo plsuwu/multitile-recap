@@ -12,6 +12,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 		redirect(307, '/');
 	}
 
+    const expires = locals.user?.refresh_after;
+    if (expires && Number(expires) < Date.now()) {
+        redirect(307, '/api/generate');
+    }
+
 	const { display_name } = locals.user;
 	const worker = new RedisCacheWorker({});
 
