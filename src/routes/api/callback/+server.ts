@@ -10,7 +10,7 @@ const HELIX = {
 	COLOR: 'https://api.twitch.tv/helix/chat/color',
 };
 
-interface TwitchUser {
+export interface TwitchUser {
 	id: string;
 	twitch_id: string;
 	login: string;
@@ -62,9 +62,11 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
 				access: tokens.accessToken,
 				refresh: tokens.refreshToken,
 				refresh_after:
-					Number(tokens.accessTokenExpiresAt) - Number(Date.now()),
-			};
+                    Date.now(),
+                    // Date.parse(tokens.accessTokenExpiresAt.toString()),
 
+			};
+        console.log('writing date: ', cachedUser.refresh_after);
 			await worker.writeUser<TwitchUser>(userId, { ...cachedUser });
 			const session = await lucia.createSession(userId, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);

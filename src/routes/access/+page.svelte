@@ -77,14 +77,16 @@
 	}
 </script>
 
-<div class="mt-48 flex h-full w-full flex-col">
+<div class="mt-10 flex h-full w-full flex-col lg:mt-48">
 	<a
 		href="/"
-		class="w-1/2 self-center transition-opacity duration-100 hover:opacity-55"
+		class="w-full self-center px-4 transition-opacity duration-100 hover:opacity-55 lg:w-1/2"
 		>{'<-'} go back</a
 	>
 	<div class="mt-16 flex w-full flex-col items-end self-center p-4">
-		<div class="flex w-1/3 flex-col items-end self-center p-4">
+		<div
+			class="flex w-full flex-col items-end self-center p-2 px-6 lg:w-1/3 lg:p-4"
+		>
 			<div class="justify-center">
 				<p>
 					Twitch Recaps make use of functions not exposed via the
@@ -111,10 +113,12 @@
 			</div>
 		</div>
 	</div>
-	<div class="mt-24 flex flex-col justify-center">
-		<div class="flex flex-row items-center justify-center space-x-6">
+	<div class="mt-12 flex flex-col justify-center lg:mt-24">
+		<div
+			class="mx-4 flex flex-col items-center justify-center lg:mx-0 lg:flex-row lg:space-x-4"
+		>
 			<input
-				class="min-w-[450px] rounded-md border-2 px-2 py-0.5"
+				class="min-w-full rounded-md border-2 px-2 py-0.5 lg:min-w-[450px]"
 				type="text"
 				placeholder={`Authorization: OAuth ${randomChars}`}
 				bind:value={input}
@@ -123,7 +127,7 @@
 			/>
 			<button
 				on:click={parseToken}
-				class="rounded-md border p-1 px-2 transition-all duration-200 hover:border-black/35 hover:opacity-55"
+				class="mt-4 rounded-md border p-1 px-2 transition-all duration-200 hover:border-black/35 hover:opacity-55 lg:mt-0"
 				>submit</button
 			>
 		</div>
@@ -148,11 +152,11 @@
 	</div>
 
 	<div
-		class="mt-24 flex h-full w-1/4 flex-col items-center justify-center self-center p-4"
+		class="mt-24 flex h-full xl:w-1/4 flex-col items-center justify-center self-center p-4"
 	>
 		<Instructions />
 		<div class="my-1"></div>
 		<Notice />
-		<div class="mt-6 flex w-1/2 flex-col items-end self-center p-4"></div>
+		<div class="mt-6 flex xl:w-1/2 flex-col items-end self-center p-4"></div>
 	</div>
 </div>

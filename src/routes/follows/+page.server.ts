@@ -11,12 +11,16 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const access = locals.user?.access;
 	const twitchId = locals.user?.twitch_id;
 	const userId = locals.user?.id;
-
 	const sessionId = locals.session?.id;
 
 	if (!access || !sessionId || !twitchId || !userId) {
 		redirect(307, '/');
 	}
+
+    const expires = locals.user?.refresh_after;
+    if (expires && Number(expires) < Date.now()) {
+        redirect(307, '/api/generate');
+    }
 
 	const worker = new RedisCacheWorker({});
 	const cached = await worker.readData<CacheData>(userId);

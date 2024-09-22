@@ -3,6 +3,7 @@ import type { RequestEvent } from './$types';
 import { fetchRecaps } from './utils';
 import { redirect } from '@sveltejs/kit';
 import type { CacheData } from '@/lib/types';
+import { twitch } from '@server/auth';
 
 export const GET = async (event: RequestEvent): Promise<Response> => {
 	const access = event.locals.user?.access;
@@ -25,11 +26,35 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
 	worker.close();
 
 	const expired = event.locals.user?.refresh_after;
-	if (expired && Date.parse(expired) < Date.now()) {
+    const refresh = event.locals.user?.refresh;
+	if (expired && Number(expired) < Date.now()) {
+        if (!refresh) {
+            console.error('[!] Refresh not defined! User must relog.');
+            redirect(300, '/api/logout');
+        }
+
+        console.log('[*] Expired auth token -> refreshing @ /api/login first.');
 		// needs token refresh; currently not implemented and straight up
 		// breaks all functionality when a user token expires
-		redirect(307, '/api/login');
-	}
+        const refreshed = await twitch.refreshAccessToken(refresh);
+        const refreshedUser = {
+            id: userId,
+            twitch_id: event.locals.user?.twitch_id,
+            login: event.locals.user?.login,
+            color: event.locals.user?.color,
+            profile_image_url: event.locals.user?.profile_image_url,
+            display_name: event.locals.user?.display_name,
+            access: refreshed.accessToken,
+            refresh: refreshed.refreshToken,
+            refresh_after:
+                Date.parse(refreshed.accessTokenExpiresAt.toString()),
+        }
+
+        const worker = new RedisCacheWorker({});
+        await worker.delete(userId);
+        await worker.writeUser(userId, refreshedUser);
+        worker.close();
+    }
 
 	const wants = event.url.searchParams.get('wants');
 	if (wants && !tmpGlobalToken && !cached?.data.recaps) {
