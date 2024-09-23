@@ -1,5 +1,6 @@
 import { createClient, type RedisClientType } from 'redis';
 import { RedisAdapter } from './redis';
+import type { TwitchUser } from '../types';
 
 const REDIS_URL = 'redis://localhost:6379';
 
@@ -28,6 +29,10 @@ class RedisCacheWorker {
 		return `user:${id}`;
 	}
 
+    private getTwitchKey(twitchId: string | number): string {
+        return `ttv:${twitchId}`;
+    }
+
 	private getDataKey(id: string | number): string {
 		return `data:${id}`;
 	}
@@ -35,6 +40,13 @@ class RedisCacheWorker {
 	private getAuthKey(id: string | number): string {
 		return `auth:${id}`;
 	}
+
+    async readTwitchUser(id: string | number): Promise<string | null> {
+		const key = this.getTwitchKey(id);
+		const user = await this.client.get(key);
+
+        return user;
+    }
 
 	async readUser<T>(id: string | number): Promise<T | null> {
 		const key = this.getUserKey(id);
@@ -74,8 +86,11 @@ class RedisCacheWorker {
 		});
 	}
 
-	async writeUser<T>(id: string | number, data: T): Promise<void> {
+	async writeUser<TwitchUser>(id: string | number, data: TwitchUser): Promise<void> {
 		const key = this.getUserKey(id);
+        const ttvKey = this.getTwitchKey((data as any).twitch_id);
+
+        await this.client.set(ttvKey, id);
 		await this.client.hSet(key, {
 			cached: JSON.stringify(data),
 		});

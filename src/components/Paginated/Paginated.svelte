@@ -2,7 +2,6 @@
 	import { currentPage, totalPages } from '$lib/stores';
 	import { paginate, formatIndex } from '@components/Paginated/utils';
 	import { search } from './utils';
-	// import { close } from '@components/Accordion/AccordionList.svelte';
 	import dayjs from 'dayjs';
 	import duration, { type Duration } from 'dayjs/plugin/duration';
 	import relativeTime from 'dayjs/plugin/relativeTime';
@@ -51,7 +50,7 @@
 		haystack: FollowsData[] | null = null
 	) {
 		if (!event && haystack) {
-            changePage(0);
+			changePage(0);
 			pagedFollowing = paginate(haystack);
 			pagedFollowing = [...pagedFollowing];
 
@@ -68,7 +67,7 @@
 			}
 
 			changePage(0);
-            query = '';
+			query = '';
 			if (filter) {
 				const res = following
 					.map((broadcaster) => {

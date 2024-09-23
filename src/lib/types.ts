@@ -1,4 +1,15 @@
 /* ---------------- HELIX -------------------- */
+export interface TwitchUser {
+    id: string;
+    twitch_id: string;
+    login: string;
+    display_name: string;
+    profile_image_url: string;
+    color: string;
+    access: string;
+    refresh: string;
+    refresh_after: number;
+}
 
 export interface FollowsData {
 	broadcaster_id: string;
