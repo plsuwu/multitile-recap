@@ -30,9 +30,6 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
 
         await worker.delete(id);
         await worker.writeUser(id, refreshedUser);
-        const t = await worker.readUser(id)
-        const u = await worker.readData(id);
-
         worker.close();
     }
 
