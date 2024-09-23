@@ -7,7 +7,7 @@
 	};
 </script>
 
-<div class="flex w-full flex-col">
+<div class="w-full flex flex-col">
 	<button
 		class="flex w-full min-w-full flex-row items-center justify-between rounded-md border border-black/25 bg-gray-400/35 p-2 font-semibold transition-all duration-200 hover:bg-black/30"
 		on:click={toggle}
@@ -27,10 +27,10 @@
 	</button>
 	{#if open}
 		<div
-			class="rounded-bl rounded-br-md border-b border-l border-r border-black/10 bg-black/5"
+			class="inline-flex rounded-bl rounded-br-md border-b border-l border-r border-black/10 bg-black/5"
 			transition:slide
 		>
-			<div class="p-4">
+			<div class="p-4 w-full inline-flex">
 				<slot name="details"></slot>
 			</div>
 		</div>

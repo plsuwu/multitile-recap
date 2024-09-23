@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	const err = $page.error?.message;
-	console.log($page);
+
 </script>
 
 {#if err}

@@ -33,7 +33,6 @@
 		role="menu"
 		tabindex="0"
 		on:keypress={(event) => {
-			console.log(event.key);
 			if (event.key === 'Escape') {
 				toggleModal(null, true);
 			}

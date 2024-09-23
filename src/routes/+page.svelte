@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import LinkTo from '@components/LinkTo/LinkTo.svelte';
+    import { loading } from '$lib/stores';
 
 	const { display_name, profile_image_url, color } = $page.data;
 	const e = $page.url.searchParams.get('e');
@@ -35,10 +37,10 @@
 
 {#if $page.data.display_name && $page.data.profile_image_url}
 	<div
-		class="flex h-screen w-screen flex-col items-center justify-center text-lg"
+		class="flex h-screen w-screen flex-col items-center justify-center text-lg overflow-y-hidden"
 	>
 		{#if e && e === 'invalid_token'}
-			<div class="my-4 text-center text-base font-bold text-red-700">
+			<div class="mb-4 text-center text-base font-bold text-red-700">
 				The Authentication token for the recaps endpoint was rejected by
 				Twitch's server.
 				<br />
@@ -46,46 +48,45 @@
 				token.
 			</div>
 		{/if}
-		<div class="mb-12">
-			<div class="text-center">
-				omg <span
-					class="rounded-xl px-2 text-2xl font-semibold italic hover:brightness-90 transition-all duration-200"
-					style={`color: ${formattedColor.fg}; background-color: ${formattedColor.bg}; background`}
-					><a
-						href={`https://www.twitch.tv/${$page.data.login}`}
-						target="_blank"
-						referrerpolicy="no-referrer">/{display_name}</a
-					></span
-				> hiii
+		<div
+			class="flex 2xl:w-1/3 xl:w-1/3 w-full px-4 lg:px-0 sm:w-4/5 md:w-1/2 flex-row items-center justify-center h-full text-sm lg:text-lg xl:text-xl"
+		>
+			<div class="w-full flex flex-col items-start flex-1 mt-7 h-full justify-center">
+				<LinkTo href="/api/logout" text={'<- logout'} />
+			</div>
+			<div class='flex flex-col items-center text-xl'>
+				<div class="flex flex-row items-center justify-center mr-3">
+					<div>omg</div>
+					<span
+						class="mx-1 mb-1 justify-center rounded-[16px] px-[7px] mt-1 font-semibold italic transition-all duration-200 hover:brightness-90 flex flex-1"
+						style={`color: ${formattedColor.fg}; background-color: ${formattedColor.bg}; background`}
+					>
+						<LinkTo
+							href={`https://www.twitch.tv/${$page.data.login}`}
+							text={`/${display_name}`}
+						/>
+					</span>
+					<div>hiii</div>
+				</div>
+				<img
+					src={profile_image_url}
+					alt="user profile"
+					class="lg:size-52 size-28 rounded-full mt-2 flex-1"
+				/>
+			</div>
+
+			<div class="flex flex-col items-end h-full justify-center mt-7 w-full flex-1">
+				<LinkTo href="/api/generate" text={'following ->'} />
+				<LinkTo href="/api/generate?wants=true" text={'recaps ->'} />
 			</div>
 		</div>
-		<img
-			src={profile_image_url}
-			alt="user profile"
-			class="size-52 rounded-full"
-		/>
-		<a
-			href="/api/generate"
-			class="mt-14 transition-opacity duration-100 hover:opacity-55"
-			>{'following & subs ->'}</a
-		>
-		<a
-			href="/api/generate?wants=true"
-			class="mt-2 transition-opacity duration-100 hover:opacity-55"
-			>recaps {'->'}</a
-		>
-		<a
-			href="/api/logout"
-			class="mb-14 mt-6 transition-opacity duration-100 hover:opacity-55"
-			>{'<-'} logout</a
-		>
 	</div>
 {:else}
 	<div
 		class="flex h-screen w-screen flex-row items-center justify-center text-2xl"
 	>
 		<div class="flex flex-col text-center">
-			<div class="my-4 flex flex-row justify-center text-center">
+			<div class="mt-4 flex flex-row justify-center text-center">
 				<div>[</div>
 				<a
 					href="/api/login"
