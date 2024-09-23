@@ -29,11 +29,11 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
     const refresh = event.locals.user?.refresh;
 	if (expired && Number(expired) < Date.now()) {
         if (!refresh) {
-            console.error('[!] Refresh not defined! User must relog.');
+
+            // console.error('[!] Refresh token not defined! User must relog.');
             redirect(300, '/api/logout');
         }
 
-        console.log('[*] Expired auth token -> refreshing @ /api/login first.');
 		// needs token refresh; currently not implemented and straight up
 		// breaks all functionality when a user token expires
         const refreshed = await twitch.refreshAccessToken(refresh);

@@ -66,7 +66,7 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
                     // Date.parse(tokens.accessTokenExpiresAt.toString()),
 
 			};
-        console.log('writing date: ', cachedUser.refresh_after);
+
 			await worker.writeUser<TwitchUser>(userId, { ...cachedUser });
 			const session = await lucia.createSession(userId, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);

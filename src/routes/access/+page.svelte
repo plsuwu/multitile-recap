@@ -83,9 +83,9 @@
 		class="w-full self-center px-4 transition-opacity duration-100 hover:opacity-55 lg:w-1/2"
 		>{'<-'} go back</a
 	>
-	<div class="mt-16 flex w-full flex-col items-end self-center p-4">
+	<div class="mt-12 flex w-full flex-col items-end self-center p-4">
 		<div
-			class="flex w-full flex-col items-end self-center p-2 px-6 lg:w-1/3 lg:p-4"
+			class="flex w-full flex-col items-end self-center p-4 px-6 lg:w-1/2 lg:p-4 border rounded-md shadow-sm"
 		>
 			<div class="justify-center">
 				<p>
@@ -152,7 +152,7 @@
 	</div>
 
 	<div
-		class="mt-24 flex h-full xl:w-1/4 flex-col items-center justify-center self-center p-4"
+		class="mt-12 flex h-full xl:w-1/3 md:w-1/2 w-full flex-col items-center justify-center self-center p-4"
 	>
 		<Instructions />
 		<div class="my-1"></div>

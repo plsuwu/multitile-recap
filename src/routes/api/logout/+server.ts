@@ -10,7 +10,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 	const access = event.locals.user?.access;
 
 	if (!sessionId || !access || !userId) {
-		console.log(
+		console.error(
 			'[!] Unable to correctly determine data to revoke:',
 			'session ->',
 			sessionId,
@@ -58,11 +58,13 @@ export async function GET(event: RequestEvent): Promise<Response> {
 					break;
 			}
 		} else {
+
 			await worker.delete(userId);
-			console.log('[+] Token revocation + cache flush ok');
 		}
 
+        worker.close();
 		await lucia.invalidateSession(sessionId);
+
 		return new Response(null, {
 			status: 302,
 			headers: {
@@ -70,7 +72,9 @@ export async function GET(event: RequestEvent): Promise<Response> {
 			},
 		});
 	} catch (err) {
-		console.log('[!] Unable to revoke token:', err);
+
+        worker.close();
+		console.error('[!] Unable to revoke token:', err);
 		return new Response(null, {
 			status: 500,
 			headers: {

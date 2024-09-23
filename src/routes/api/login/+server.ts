@@ -2,7 +2,6 @@ import { twitch } from '@server/auth';
 import RedisCacheWorker from '@server/cache';
 import { redirect, type RequestEvent } from '@sveltejs/kit';
 import { generateState } from 'arctic';
-import type { RegisteredDatabaseUserAttributes, RegisteredLucia } from 'lucia';
 
 export const GET = async (event: RequestEvent): Promise<Response> => {
 
@@ -22,26 +21,13 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
             refresh: refreshed.refreshToken,
             refresh_after:
                 Date.parse(refreshed.accessTokenExpiresAt.toString()),
-        }
-
+        };
 
         const worker = new RedisCacheWorker({});
-
-
         await worker.delete(id);
         await worker.writeUser(id, refreshedUser);
         worker.close();
     }
-
-    // console.log('[*] Refreshing expired token.');
-    // const refreshedToken = twitch.refreshAccessToken(twitch_id);
-    // console.log('[+] refreshed: ', refreshedToken);
-    //
-    // const data = { id, twitch_id, color, login, display_name, profile_image_url, access: refreshedToken.access, refresh, refresh_after }
-    //
-
-
-
 
     const state = generateState();
     const scopes = {

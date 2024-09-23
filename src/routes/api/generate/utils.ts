@@ -201,7 +201,7 @@ async function fetchRecaps(
 				},
 			});
 		} catch (err) {
-			console.log(err);
+			console.error(err);
 			if (err instanceof TypeError) {
 				// TypeError means this was probably a bad token;
 				// shouldnt happen (we verify it prior to running all of this)
