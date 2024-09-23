@@ -57,14 +57,10 @@ export async function GET(event: RequestEvent): Promise<Response> {
 					);
 					break;
 			}
-		} else {
-
-			await worker.delete(userId);
 		}
 
         worker.close();
 		await lucia.invalidateSession(sessionId);
-
 		return new Response(null, {
 			status: 302,
 			headers: {
