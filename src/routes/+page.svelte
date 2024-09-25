@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { handleRefresh } from '$lib/internal';
+	import { getRgba, handleRefresh } from '$lib/internal';
 	import { BarLoader } from 'svelte-loading-spinners';
 	import LinkTo from '@components/LinkTo/LinkTo.svelte';
 	import Error from '@components/Error/Error.svelte';
@@ -10,7 +10,7 @@
 
 	const { display_name, profile_image_url, color } = $page.data;
 	const e = $page.url.searchParams.get('err');
-	$: r = $page.url.searchParams.get('refresh');
+	$: r = $page.url.searchParams.get('r');
 
 	$: refreshing = false;
 
@@ -21,37 +21,10 @@
 		if (!res.error) {
 			window.location.href = '/?r=ok';
 		} else {
-			console.log('LOC', res.location);
 			window.location.href = `/?err=${res.location}`;
 		}
 
 		refreshing = false;
-	}
-
-	function getRgba(color: string) {
-		const hex = color.slice(1);
-		let r = parseInt(hex.substring(0, 2), 16);
-		let g = parseInt(hex.substring(2, 4), 16);
-		let b = parseInt(hex.substring(4, 6), 16);
-
-		const backgroundColor = `rgba(${r}, ${g}, ${b}, 1)`;
-		const darkest = Math.min(r, g, b);
-		if (darkest === r) {
-			r = Math.floor(r * 0.1);
-			g = Math.floor(g * 0.5);
-			b = Math.floor(b * 0.5);
-		} else if (darkest === g) {
-			r = Math.floor(r * 0.5);
-			g = Math.floor(g * 0.1);
-			b = Math.floor(b * 0.5);
-		} else if (darkest === b) {
-			r = Math.floor(r * 0.5);
-			g = Math.floor(g * 0.5);
-			b = Math.floor(b * 0.1);
-		}
-
-		const foregroundColor = `rgba(${r}, ${g}, ${b}, 1)`;
-		return { fg: foregroundColor, bg: backgroundColor };
 	}
 
 	const formattedColor = color ? getRgba(color) : { bg: '#FFF', fg: '#000' };
@@ -142,9 +115,11 @@
 						<div></div>
 						{#if r}
 							<div
-								class="flex-0 flex flex-row items-center justify-center pt-3 text-sm italic text-gray-500/55"
+								class="flex flex-0 flex-row items-center justify-center pt-2 transition-opacity duration-100 hover:opacity-55"
 							>
-								refreshed.
+
+								<div class="mr-2 invisible">refresh</div>
+								<span class='text-sm text-gray-500 mt-1'>refreshed.</span>
 							</div>
 						{:else}
 							<div
