@@ -85,7 +85,7 @@
 	>
 	<div class="mt-12 flex w-full flex-col items-end self-center p-4">
 		<div
-			class="flex w-full flex-col items-end self-center p-4 px-6 lg:w-1/2 lg:p-4 border rounded-md shadow-sm"
+			class="flex w-full flex-col items-end self-center p-4 px-6 shadow-sm lg:w-1/4 lg:p-4"
 		>
 			<div class="justify-center">
 				<p>
@@ -107,7 +107,7 @@
 						referrerpolicy="no-referrer"
 						class="text-blue-500 underline transition-all duration-200 hover:brightness-50"
 						>twitch.tv</a
-					>.
+					> (further instructions below).
 				</p>
 				<div class="my-4"></div>
 			</div>
@@ -141,7 +141,7 @@
 				{#if authOkay}
 					<div class="my-2 text-center text-blue-400">
 						<a
-							href="/api/generate?wants=true"
+							href="/api/generate?type=recaps"
 							class="transition-opacity duration-100 hover:opacity-55"
 							>generate recaps {'->'}</a
 						>
@@ -152,11 +152,13 @@
 	</div>
 
 	<div
-		class="mt-12 flex h-full xl:w-1/3 md:w-1/2 w-full flex-col items-center justify-center self-center p-4"
+		class="mt-12 flex h-full w-full flex-col items-center justify-center self-center p-4 md:w-1/2 xl:w-1/3"
 	>
 		<Instructions />
 		<div class="my-1"></div>
 		<Notice />
-		<div class="mt-6 flex xl:w-1/2 flex-col items-end self-center p-4"></div>
+		<div
+			class="mt-6 flex flex-col items-end self-center p-4 xl:w-1/2"
+		></div>
 	</div>
 </div>

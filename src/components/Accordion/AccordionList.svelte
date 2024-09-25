@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { slide } from 'svelte/transition';
 	export let index: number;
-    export let open: boolean;
-    export let toggle: (event: MouseEvent) => void | undefined
-
+	export let open: boolean;
+	export let toggle: (event: MouseEvent) => void | undefined;
 </script>
 
 <div class="my-0.5 flex w-full flex-col">

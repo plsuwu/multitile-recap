@@ -94,13 +94,13 @@
 			>
 		</div>
 	</div>
-	<div class="flex flex-col w-full">
+	<div class="flex w-full flex-col">
 		{#key usingRecaps || userRows}
 			{#each Array(rows) as _, rowIdx}
-				<div class="flex flex-row w-full">
+				<div class="flex w-full flex-row">
 					{#each usingRecaps.slice(rowIdx * userRows, (rowIdx + 1) * userRows) as recap}
 						<div
-							class="w-full justify-self-end  flex flex-1 justify-around bg-gradient-to-t from-[#facdc8] via-[#bf94ff] via-[#fab4ff] to-[#a3c1ff] px-[20px] py-[20px] text-[#efeff1]"
+							class="flex w-full flex-1 justify-around justify-self-end bg-gradient-to-t from-[#facdc8] via-[#bf94ff] via-[#fab4ff] to-[#a3c1ff] px-[20px] py-[20px] text-[#efeff1]"
 						>
 							<Card {recap} />
 						</div>

@@ -1,54 +1,72 @@
 import RedisCacheWorker from '@server/cache';
 import type { RequestEvent } from '@sveltejs/kit';
 import type { DatabaseUser } from 'lucia';
-import { tokenIsValid } from './utils';
+import { tokenIsSanitary, tokenIsValid } from './utils';
 
 export const POST = async (event: RequestEvent): Promise<Response> => {
-	const { token } = await event.request.json();
-	const userId = event.locals.user?.id;
-	const twitchId = event.locals.user?.twitch_id;
+    const { token } = await event.request.json();
+    const userId = event.locals.user?.id;
+    const twitchId = event.locals.user?.twitch_id;
 
-	if (!tokenIsSanitary(token) || !userId || !twitchId) {
-		return new Response(null, {
-			status: 400,
-		});
-	}
+    if (!token || !userId || !twitchId) {
+        return new Response(
+            JSON.stringify({
+                error: true,
+                message: 'Invalid or missing credentials'
+            }), {
+            status: 400,
+        });
+    }
 
-	const valid = await tokenIsValid(token, twitchId);
-	if (!valid) {
-		return new Response(null, {
-			status: 400,
-		});
-	}
+    if (!tokenIsSanitary(token)) {
+        return new Response(
+            JSON.stringify({
+                error: true,
+                mesage: 'Invalid characters in token',
+            }),
+            {
+                status: 401,
+            }
+        );
+    }
 
-	const worker = new RedisCacheWorker({});
-	const cached = await worker.readUser<DatabaseUser>(userId);
-	if (!cached) {
-		return new Response(null, {
-			status: 400,
-		});
-	}
+    const valid = await tokenIsValid(token, twitchId);
+    if (valid.error) {
+        return new Response(
+            JSON.stringify({
+                error: true,
+                message: `Token invalid for user ${userId}: ${valid.message} (see 'details' field)`,
+                details: valid,
+            }),
+            {
+                status: 401,
+            });
+    }
 
-	worker.writeTempAuth(userId, token);
-	worker.close();
+    const worker = new RedisCacheWorker({});
 
-	return new Response(JSON.stringify({ ok: true }), {
-		status: 200,
-		headers: {
-			'Content-Type': 'application/json',
-		},
-	});
+    // not sure why this would happen but i did it for a reason ??
+    //
+    // const cached = await worker.readUser<DatabaseUser>(userId);
+    // if (!cached) {
+    //     return new Response(
+    //         JSON.stringify({
+    //             error: true,
+    //             message: `User ${userId} has no cached user information`
+    //         }),
+    //         {
+    //             status: 404,
+    //         }
+    //     );
+    // }
+
+    worker.writeTempAuth(userId, token);
+    worker.close();
+
+    return new Response(JSON.stringify({ ok: true }), {
+        status: 200,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
 };
-
-async function tokenIsSanitary(input: string) {
-	if (!input || input.length !== 30) {
-		return false;
-	}
-
-	const nonAscii = input.toLowerCase().match(/[^a-z0-9]/gi);
-	if (nonAscii) {
-		return false;
-	}
-
-	return true;
-}
