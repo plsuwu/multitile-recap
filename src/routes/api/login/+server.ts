@@ -4,11 +4,15 @@ import { redirect, type RequestEvent } from '@sveltejs/kit';
 import { generateState } from 'arctic';
 
 export const GET = async (event: RequestEvent): Promise<Response> => {
-
     const id = event.locals.user?.id;
     const refreshToken = event.locals.user?.refresh;
     const refreshAfter = event.locals.user?.refresh_after;
-    if (id && refreshToken && refreshAfter && (Number(refreshAfter) <= Date.now())) {
+    if (
+        id &&
+        refreshToken &&
+        refreshAfter &&
+        Number(refreshAfter) <= Date.now()
+    ) {
         const refreshed = await twitch.refreshAccessToken(refreshToken);
         const refreshedUser = {
             id,
@@ -19,8 +23,9 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
             display_name: event.locals.user?.display_name,
             access: refreshed.accessToken,
             refresh: refreshed.refreshToken,
-            refresh_after:
-                Date.parse(refreshed.accessTokenExpiresAt.toString()),
+            refresh_after: Date.parse(
+                refreshed.accessTokenExpiresAt.toString()
+            ),
         };
 
         const worker = new RedisCacheWorker({});
@@ -44,4 +49,4 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
     });
 
     redirect(302, url.toString());
-}
+};

@@ -29,9 +29,9 @@ class RedisCacheWorker {
 		return `user:${id}`;
 	}
 
-    private getTwitchKey(twitchId: string | number): string {
-        return `ttv:${twitchId}`;
-    }
+	private getTwitchKey(twitchId: string | number): string {
+		return `ttv:${twitchId}`;
+	}
 
 	private getDataKey(id: string | number): string {
 		return `data:${id}`;
@@ -41,12 +41,12 @@ class RedisCacheWorker {
 		return `auth:${id}`;
 	}
 
-    async readTwitchUser(id: string | number): Promise<string | null> {
+	async readTwitchUser(id: string | number): Promise<string | null> {
 		const key = this.getTwitchKey(id);
 		const user = await this.client.get(key);
 
-        return user;
-    }
+		return user;
+	}
 
 	async readUser<T>(id: string | number): Promise<T | null> {
 		const key = this.getUserKey(id);
@@ -86,11 +86,14 @@ class RedisCacheWorker {
 		});
 	}
 
-	async writeUser<TwitchUser>(id: string | number, data: TwitchUser): Promise<void> {
+	async writeUser<TwitchUser>(
+		id: string | number,
+		data: TwitchUser
+	): Promise<void> {
 		const key = this.getUserKey(id);
-        const ttvKey = this.getTwitchKey((data as any).twitch_id);
+		const ttvKey = this.getTwitchKey((data as any).twitch_id);
 
-        await this.client.set(ttvKey, id);
+		await this.client.set(ttvKey, id);
 		await this.client.hSet(key, {
 			cached: JSON.stringify(data),
 		});
@@ -116,11 +119,8 @@ class RedisCacheWorker {
 		await this.client.del(key);
 	}
 
-	async purgeUser(id: string | number): Promise<void> {
-		const userKey = this.getUserKey(id);
+	async deleteData(id: string | number): Promise<void> {
 		const dataKey = this.getDataKey(id);
-
-		await this.client.del(userKey);
 		await this.client.del(dataKey);
 	}
 

@@ -13,16 +13,18 @@
 			<p>
 				Yes, this type of token probably provides unreasonably extensive
 				access to your account, and you kind of just have to trust that
-				I'm not doing anything nefarious. With this said, the provided
-				token's validity can be revoked at from
+				I'm not doing anything nefarious (meaning you probably shouldn't
+				be giving this token to me). With this said, the provided
+				token's validity can be revoked very easily by either logging
+				out of the session that the token was pulled from, or clicking
+				the "Sign Out Everywher" button on
 				<a
 					href="https://www.twitch.tv/settings/security"
 					target="_blank"
 					referrerpolicy="no-referrer"
 					class="text-blue-500 underline transition-all duration-200 hover:brightness-50"
 					>your security settings page</a
-				>, or simply by logging out of the session that the token was
-				pulled from.
+				>.
 			</p>
 			<div class="my-3 border-b border-black/10"></div>
 			<p class="mb-1 text-base font-semibold">credential storage</p>

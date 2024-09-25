@@ -10,15 +10,29 @@ export const GET = async (event: RequestEvent): Promise<any> => {
 	const userId = event.locals.user?.id;
 	const token = event.locals.user?.access;
 
-	if (!broadcaster || !userId || !token) {
+	if (!userId || !token) {
 		return new Response(
 			JSON.stringify({
 				error: true,
-				message: 'missing broadcaster or user details/authentication',
+				message: 'Invalid or missing credentials',
 			}),
-			{ status: 400 }
+			{
+                status: 400
+            }
 		);
 	}
+
+    if (!broadcaster) {
+		return new Response(
+			JSON.stringify({
+				error: true,
+				message: 'Missing broadcaster ID',
+			}),
+			{
+                status: 404
+            }
+		);
+    }
 
 	const headers = buildAuthorizedHeader(token);
 	const res = await fetch(

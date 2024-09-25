@@ -5,7 +5,8 @@ import { buildAuthorizedHeader } from '@server/utility';
 export const tokenIsValid = async (
 	token: string,
 	twitch_id: string
-): Promise<boolean> => {
+): Promise<{ error: boolean, message: string, details?: unknown }> => {
+    let  result = { error: false, message: '', details: undefined as unknown };
 	const op = [
 		{
 			operationName: 'CoreActionsCurrentUser',
@@ -34,12 +35,30 @@ export const tokenIsValid = async (
 
 		const [body] = await res.json();
 		if (body.data.currentUser.id !== twitch_id) {
-			return false;
+            result.error = true;
+            result.message = 'Response ID does not match';
+			return result;
 		}
 
-		return true;
+        return result;
 	} catch (err) {
 		console.error('[!] Error while validating GQL token:', err);
-		return false;
+        result.error = true;
+        result.message = `Unhandled error during validation: ${err} (see 'details' field)`;
+        result.details = err;
+		return result;
 	}
 };
+
+export async function tokenIsSanitary(input: string) {
+	if (!input || input.length !== 30) {
+		return false;
+	}
+
+	const nonAscii = input.toLowerCase().match(/[^a-z0-9]/gi);
+	if (nonAscii) {
+		return false;
+	}
+
+	return true;
+}

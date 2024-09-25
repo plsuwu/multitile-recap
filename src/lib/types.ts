@@ -1,14 +1,14 @@
 /* ---------------- HELIX -------------------- */
 export interface TwitchUser {
-    id: string;
-    twitch_id: string;
-    login: string;
-    display_name: string;
-    profile_image_url: string;
-    color: string;
-    access: string;
-    refresh: string;
-    refresh_after: number;
+	id: string;
+	twitch_id: string;
+	login: string;
+	display_name: string;
+	profile_image_url: string;
+	color: string;
+	access: string;
+	refresh: string;
+	refresh_after: number;
 }
 
 export interface FollowsData {
@@ -174,6 +174,7 @@ export interface RecapsQueryResponse {
 
 export interface CacheData {
 	id: string;
+	write_time: number;
 	data: {
 		following: FollowsData[];
 		subscriptions: UserSubscriptions[];

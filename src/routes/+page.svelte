@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import LinkTo from '@components/LinkTo/LinkTo.svelte';
-    import { loading } from '$lib/stores';
+	import HeroiconsArrowPath from '~icons/heroicons/arrow-path';
+
 
 	const { display_name, profile_image_url, color } = $page.data;
 	const e = $page.url.searchParams.get('e');
+	$: r = $page.url.searchParams.get('ref_ok');
 
 	function getRgba(color: string) {
 		const hex = color.slice(1);
@@ -37,7 +39,7 @@
 
 {#if $page.data.display_name && $page.data.profile_image_url}
 	<div
-		class="flex h-screen w-screen flex-col items-center justify-center text-lg overflow-y-hidden"
+		class="flex h-screen w-screen flex-col items-center justify-center overflow-y-hidden text-lg"
 	>
 		{#if e && e === 'invalid_token'}
 			<div class="mb-4 text-center text-base font-bold text-red-700">
@@ -49,21 +51,24 @@
 			</div>
 		{/if}
 		<div
-			class="flex 2xl:w-1/3 xl:w-1/3 w-full px-4 lg:px-0 sm:w-4/5 md:w-1/2 flex-row items-center justify-center h-full text-sm lg:text-lg xl:text-xl"
+			class="flex h-full w-full flex-row items-center justify-center px-4 text-sm sm:w-4/5 md:w-1/2 lg:px-0 lg:text-lg xl:w-1/3 xl:text-xl 2xl:w-1/3"
 		>
-			<div class="w-full flex flex-col items-start flex-1 mt-7 h-full justify-center">
-				<LinkTo href="/api/logout" text={'<- logout'} />
+			<div
+				class="mt-7 flex h-full w-full flex-1 flex-col items-center justify-center"
+			>
+				<a href='/api/logout'>logout</a>
 			</div>
-			<div class='flex flex-col items-center text-xl'>
-				<div class="flex flex-row items-center justify-center mr-3">
+			<div class="flex flex-col items-center text-xl">
+				<div class="mr-3 flex flex-row items-center justify-center">
 					<div>omg</div>
 					<span
-						class="mx-1 mb-1 justify-center rounded-[16px] px-[7px] mt-1 font-semibold italic transition-all duration-200 hover:brightness-90 flex flex-1"
+						class="mx-1 mb-1 mt-1 flex flex-1 justify-center rounded-[16px] px-[7px] font-semibold italic transition-all duration-200 hover:brightness-90"
 						style={`color: ${formattedColor.fg}; background-color: ${formattedColor.bg}; background`}
 					>
 						<LinkTo
 							href={`https://www.twitch.tv/${$page.data.login}`}
 							text={`/${display_name}`}
+							targetBlank={true}
 						/>
 					</span>
 					<div>hiii</div>
@@ -71,13 +76,41 @@
 				<img
 					src={profile_image_url}
 					alt="user profile"
-					class="lg:size-52 size-28 rounded-full mt-2 flex-1"
+					class="mt-2 size-28 flex-1 rounded-full border border-black p-1 shadow-md lg:size-52"
 				/>
+				<div class="mt-4">
+					{#if $page.data.cache && !r}
+                    <div></div>
+						<button
+							class="flex flex-row items-center justify-center pt-1 transition-opacity duration-100 hover:opacity-55"
+						>
+							<div class="mr-2">refresh</div>
+							<HeroiconsArrowPath />
+						</button>
+					{:else}
+						<div></div>
+						{#if r}
+							<div
+								class="flex-0 flex flex-row items-center justify-center pt-3 text-sm italic text-gray-500/55"
+							>
+								refreshed.
+							</div>
+						{:else}
+							<div
+								class="flex-0 invisible flex flex-row items-center justify-center pt-3 text-base italic"
+							>
+								*
+							</div>
+						{/if}
+					{/if}
+				</div>
 			</div>
 
-			<div class="flex flex-col items-end h-full justify-center mt-7 w-full flex-1">
-				<LinkTo href="/api/generate" text={'following ->'} />
-				<LinkTo href="/api/generate?wants=true" text={'recaps ->'} />
+			<div
+				class="mt-7 flex h-full w-full flex-1 flex-col items-center justify-center"
+			>
+				<a href='/follows'>following</a>
+				<a href='/recaps'>recaps</a>
 			</div>
 		</div>
 	</div>
@@ -89,7 +122,7 @@
 			<div class="mt-4 flex flex-row justify-center text-center">
 				<div>[</div>
 				<a
-					href="/api/login"
+                    href='/api/login'
 					class="text-semibold transition-opacity duration-200 hover:opacity-25"
 					>auth w/ <span class="text-[#a970ff]">twitch.tv</span>
 					{'->'}</a

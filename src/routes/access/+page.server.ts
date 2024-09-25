@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit';
-import type { PageServerLoad } from '../generate/$types';
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const sessionId = locals.session?.id;

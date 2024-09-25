@@ -1,4 +1,5 @@
 <script lang="ts">
+	import HeroiconsArrowUpRight from '~icons/heroicons/arrow-up-right';
 	import { currentPage, totalPages } from '$lib/stores';
 	import { paginate, formatIndex } from '@components/Paginated/utils';
 	import { search } from './utils';
@@ -24,9 +25,6 @@
 	);
 
 	function toggleSingle(pageIndex: number, broadcasterIndex: number) {
-		console.log(accStates[pageIndex][broadcasterIndex]);
-		console.log(pagedFollowing[pageIndex][broadcasterIndex]);
-		console.log(pagedFollowing);
 
 		accStates[pageIndex][broadcasterIndex] =
 			!accStates[pageIndex][broadcasterIndex];
@@ -323,12 +321,16 @@
 									>
 										<a
 											href={`https://www.twitch.tv/${broadcaster.broadcaster_login}`}
-											class="text-[#a970ff] brightness-90 transition-all duration-200 hover:opacity-55"
+											class="flex flex-row text-[#a970ff] brightness-90 transition-all duration-200 hover:opacity-55"
 											target="_blank"
 											referrerpolicy="no-referrer"
 										>
-											/{broadcaster.broadcaster_name}
-											{'->'}
+											<div>
+												/{broadcaster.broadcaster_name}
+											</div>
+											<HeroiconsArrowUpRight
+												style="font-size: 10px; margin-left: 4px; margin-top: 2px"
+											/>
 										</a>
 									</span>
 								</div>
