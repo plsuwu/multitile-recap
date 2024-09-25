@@ -44,6 +44,7 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
 			JSON.stringify({
 				error: true,
 				message: `Cannot refresh cached data yet (${canRefreshIn / 1000} seconds remaining)`,
+                timeout: `${canRefreshIn / 1000}`,
 			}),
 			{
                 status: 401
@@ -65,7 +66,13 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
         );
     }
 
-	return new Response(null, {
-		status: 200,
-	});
+	return new Response(
+        JSON.stringify({
+            error: false,
+            message: null,
+        }),
+        {
+	    	status: 200,
+	    }
+    );
 };

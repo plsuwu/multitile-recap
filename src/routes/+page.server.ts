@@ -13,7 +13,7 @@ export const load: PageServerLoad = async (event: RequestEvent) => {
 	worker.close();
 
 
-	const refreshable = cached && cached.write_time && (cached.write_time + 300000 < Date.now());
+	const refreshable = cached && cached.write_time && (cached.write_time + 600000 < Date.now());
 
 	return {
 		display_name,

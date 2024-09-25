@@ -94,20 +94,23 @@ export async function GET(event: RequestEvent): Promise<Response> {
         if (result.error) {
             console.error('[!] Error response during token revocation: ', result.message);
 
-            const { error, message, status } = result;
+            const { error, message, status, location } = result;
             return new Response(
                 JSON.stringify({ error, message, status }),
                 {
                     status: 300,
                     headers: {
-                        Location: '/?err=remote%20error',
+                        Location: location,
                     },
                 },
             );
         }
 
         return new Response(
-            JSON.stringify({ error: false, messsage: 'ok' }),
+            JSON.stringify({
+                error: false,
+                messsage: null
+            }),
             {
                 status: 302,
                 headers: {

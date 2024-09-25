@@ -9,27 +9,29 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
     const body = await res.json();
 
     if (!res.ok) {
+        console.error('[!] Err: ', body);
         redirect(300, body.location);
     }
 
     const worker = new RedisCacheWorker({});
-    const cached = await worker.readData<CacheData>(body.id);
-    worker.close();
+    let cached = await worker.readData<CacheData>(body.id);
 
     if (!cached || !cached.data.following) {
         const cacheRes = await fetch('/api/generate?type=base', {
             method: 'GET',
         });
 
-        if (!cacheRes.ok) {
-            const cacheOk = await cacheRes.json();
-             return {
-                 error: cacheOk,
-             }
+        const cacheResJson = await cacheRes.json();
+        if (cacheResJson.error) {
+            worker.close();
+            redirect(300, '/?err=issue%20fetching%20follows');
         }
+
+        cached = await worker.readData<CacheData>(body.id) as CacheData;
     }
 
-    const { following, subscriptions } = (cached as CacheData).data;
+    worker.close();
+    const { following, subscriptions } = cached.data;
     return {
         subscriptions,
         following,

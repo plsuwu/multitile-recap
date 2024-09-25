@@ -64,7 +64,13 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
     await worker.writeUser(userId, refreshedUser);
     worker.close();
 
-    return new Response(null, {
-        status: 200,
-    });
+    return new Response(
+        JSON.stringify({
+            error: false,
+            message: null,
+        }),
+        {
+            status: 200,
+        }
+    );
 }

@@ -16,6 +16,7 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
             JSON.stringify({
                 error: true,
                 message: 'Invalid or missing credentials',
+                location: '/?err=missing%20credentials',
             }),
             {
                 status: 400,
@@ -30,15 +31,23 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
 
     const expired = event.locals.user?.refresh_after;
     if (expired && Number(expired) < Date.now()) {
-        return new Response(
-            JSON.stringify({
-                error: true,
-                message: 'OAuth token expired, access must be refreshed',
-            }),
-            {
-                status: 401,
-            }
-        );
+        const ref = await fetch('/api/refresh/access', {
+            method: 'GET',
+        });
+
+        const body = await ref.json();
+        if (body.error) {
+            return new Response(
+                JSON.stringify({
+                    error: true,
+                    message: 'Unable to refresh access token (see \'details\' field).',
+                    details: body,
+                }),
+                {
+                    status: body.status
+                }
+            );
+        }
     }
 
     const type = event.url.searchParams.get('type') ?? 'base';
@@ -49,6 +58,7 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
                 message:
                     `Unknown search parameter '${type}':` +
                     `expected one of '${REQUEST_TYPES.join(', ')}'`,
+                location: '/?err=missing%20credentials',
             }),
             {
                 status: 404,
@@ -61,7 +71,7 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
         return new Response(
             JSON.stringify({
                 error: true,
-                message: 'Missing cached recap data and no GQL auth token'
+                message: 'Missing cached recap data with a GQL auth token'
             }),
             {
                 status: 403,
@@ -73,7 +83,12 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
         || (type === 'base' && cached?.data.following))
         // && !refreshData
     ) {
-        return new Response(null, {
+        return new Response(
+        JSON.stringify({
+            error: false,
+            message: null
+        }),
+        {
             status: 200,
         });
     }
@@ -96,7 +111,13 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
         );
     }
 
-    return new Response(null, {
-        status: 200,
-    });
+    return new Response(
+        JSON.stringify({
+            error: false,
+            message: null,
+        }),
+        {
+            status: 200,
+        }
+    );
 }

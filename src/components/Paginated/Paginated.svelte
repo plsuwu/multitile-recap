@@ -25,7 +25,6 @@
 	);
 
 	function toggleSingle(pageIndex: number, broadcasterIndex: number) {
-
 		accStates[pageIndex][broadcasterIndex] =
 			!accStates[pageIndex][broadcasterIndex];
 		accStates = [...accStates];
@@ -96,6 +95,13 @@
 		});
 
 		return res;
+	}
+
+	function formatFollowedDate(date: string): string {
+        const formatted = dayjs(date).format('h:mma on ddd, DD MMM YYYY');
+        console.log(formatted);
+
+        return formatted;
 	}
 
 	type DurationUnit = 'years' | 'months' | 'days' | 'hours' | 'minutes';
@@ -223,7 +229,7 @@
 				{#if isPlaceholder(broadcaster)}
 					<!--
                         keep page numbers below the list of followed
-                        users in a consisten location
+                        users in a consistent layout
                     -->
 					<AccordionBlank index={bIndex} />
 				{:else}
@@ -271,10 +277,10 @@
 									)}
 
 									<div class="italic text-gray-500">
-										(since <span class="font-medium"
-											>{new Date(
+										(followed at <span class="font-medium"
+											>{formatFollowedDate(
 												broadcaster.followed_at
-											).toLocaleString()}</span
+											)}</span
 										>)
 									</div>
 									{#if subscribed(broadcaster.broadcaster_name)}
@@ -292,8 +298,7 @@
 																Tier
 															</div>
 															<div class="ml-1">
-																{' '}{subscription
-																	.tier[0]}
+																{' '}{subscription.tier.toString()[0]}
 															</div>
 														</div>
 														{#if subscription.is_gift}
@@ -305,7 +310,7 @@
 																	class="font-medium text-blue-400 underline transition-all duration-200 hover:brightness-50"
 																	target="_blank"
 																	referrerpolicy="no-referrer"
-																	>@{subscription.gifter_login}</a
+																	>/{subscription.gifter_login}</a
 																>)
 															</div>
 														{/if}

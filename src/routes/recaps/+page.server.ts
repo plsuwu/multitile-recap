@@ -9,6 +9,7 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
     const body = await res.json();
 
     if (!res.ok) {
+        console.error('[!] Err: ', body);
         redirect(300, body.location);
     }
 
@@ -19,6 +20,21 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
     if ((!cached || !cached.data.recaps) && !hasAuth) {
         worker.close();
         redirect(302, '/access');
+    }
+
+    if (hasAuth && (!cached || !cached.data.recaps)) {
+        worker.close();
+        const res = await fetch('/api/generate?type=recaps', {
+            method: 'GET',
+        });
+
+        const written = await res.json();
+        if (written.error) {
+            worker.close();
+            redirect(302, '/?err=issue%20fetching%20recaps');
+        }
+
+        cached = await worker.readData<CacheData>(body.id) as CacheData; // just assume the data is cached
     }
 
 

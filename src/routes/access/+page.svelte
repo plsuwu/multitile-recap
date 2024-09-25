@@ -141,7 +141,7 @@
 				{#if authOkay}
 					<div class="my-2 text-center text-blue-400">
 						<a
-							href="/api/generate?type=recaps"
+							href="/recaps"
 							class="transition-opacity duration-100 hover:opacity-55"
 							>generate recaps {'->'}</a
 						>
