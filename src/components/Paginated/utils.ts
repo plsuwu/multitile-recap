@@ -137,6 +137,5 @@ export function search(haystack: FollowsData[], needle: string): any[] {
 		.filter((r) => r.sim > 0.5)
 		.sort((a, b) => b.sim - a.sim);
 
-	console.log(res);
 	return [...res.map((r) => r.broadcaster)];
 }

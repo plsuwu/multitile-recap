@@ -99,8 +99,6 @@
 
 	function formatFollowedDate(date: string): string {
         const formatted = dayjs(date).format('h:mma on ddd, DD MMM YYYY');
-        console.log(formatted);
-
         return formatted;
 	}
 

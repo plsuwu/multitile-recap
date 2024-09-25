@@ -7,8 +7,12 @@
 </script>
 
 <div class="my-8 flex w-full flex-col items-center px-6 py-4 xl:w-1/2 xl:px-2">
-	<a href="/" class="w-full self-start">
-		{'<- back'}
+	<a
+		href="/"
+		class="self-start transition-opacity duration-100 hover:opacity-55"
+	>
+		{'<-'} back
 	</a>
+
 	<Paginated {following} {subscriptions} />
 </div>

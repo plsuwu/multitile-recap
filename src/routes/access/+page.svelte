@@ -1,12 +1,17 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { navigating, page } from '$app/stores';
 	import Instructions from '@components/AccessContent/Instructions.svelte';
+	import { getRgba } from '$lib/internal';
 	import Notice from '@components/AccessContent/Notice.svelte';
+	import { BarLoader, Circle } from 'svelte-loading-spinners';
 
 	$: input = '';
 	$: error = { error: false, reason: '' };
 	$: randomChars = mkRandChars();
 	$: authOkay = false;
+	$: loadingRecaps = false;
+
+	const { color } = $page.data.color;
 
 	function handleInputChange(inputContent: string) {
 		input = inputContent;
@@ -24,6 +29,8 @@
 	}
 
 	async function parseToken() {
+		loadingRecaps = true;
+
 		// clear the existing error if is set
 		if (error.error) {
 			error.error = false;
@@ -35,12 +42,15 @@
 			const t = input.toLowerCase().split('oauth ')[1];
 			if (!t || t.length !== 30) {
 				error = { error: true, reason: `Invalid OAuth token.` };
+				loadingRecaps = false;
 				return;
 			}
 			body = t;
 		} else {
 			if (!input || input.length !== 30) {
 				error = { error: true, reason: `Invalid OAuth token.` };
+
+				loadingRecaps = false;
 				return;
 			}
 			body = input;
@@ -52,6 +62,8 @@
 				error: true,
 				reason: 'OAuth token should be alpha-numeric',
 			};
+
+			loadingRecaps = false;
 			return;
 		}
 
@@ -72,9 +84,16 @@
 			};
 		} else {
 			authOkay = true;
+
+			loadingRecaps = false;
 			return await res.json();
 		}
+
+		// catch anything that falls through
+		loadingRecaps = false;
 	}
+
+	const formattedColor = color ? getRgba(color) : { bg: '#FFF', fg: '#000' };
 </script>
 
 <div class="mt-10 flex h-full w-full flex-col lg:mt-48">
@@ -125,11 +144,22 @@
 				on:input={(event) =>
 					handleInputChange(event.currentTarget.value)}
 			/>
-			<button
-				on:click={parseToken}
-				class="mt-4 rounded-md border p-1 px-2 transition-all duration-200 hover:border-black/35 hover:opacity-55 lg:mt-0"
-				>submit</button
-			>
+			{#if loadingRecaps}
+				<div
+					class="mt-4 p-0.5 px-[19px] pl-[20px] transition-all duration-200 lg:mt-0"
+					style={`background-color: ${formattedColor.bg}`}
+				>
+                    <Circle color={formattedColor.fg} size='30' />
+
+				</div>
+			{:else}
+
+				<button
+					on:click={parseToken}
+					class="mt-4 rounded-md border p-1 px-2 transition-all duration-200 hover:border-black/35 hover:opacity-55 lg:mt-0"
+					>submit</button
+				>
+			{/if}
 		</div>
 		<div class="my-2 block h-[24px]">
 			{#key error || authOkay}
@@ -139,12 +169,25 @@
 					</div>
 				{/if}
 				{#if authOkay}
-					<div class="my-2 text-center text-blue-400">
-						<a
-							href="/recaps"
-							class="transition-opacity duration-100 hover:opacity-55"
-							>generate recaps {'->'}</a
-						>
+					<div
+						class="my-2 flex flex-row justify-center text-center text-blue-400"
+					>
+						<!-- {#key $page.url} -->
+						{#if $navigating}
+							<div
+                            class='mt-3'
+								style={`background-color: ${formattedColor.bg}`}
+							>
+								<BarLoader color={formattedColor.fg} />
+							</div>
+						{:else}
+							<a
+								href="/recaps"
+								class="transition-opacity duration-100 hover:opacity-55"
+								>generate recaps {'->'}</a
+							>
+						{/if}
+						<!-- {/key} -->
 					</div>
 				{/if}
 			{/key}

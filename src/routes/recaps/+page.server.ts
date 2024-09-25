@@ -23,7 +23,6 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
     }
 
     if (hasAuth && (!cached || !cached.data.recaps)) {
-        worker.close();
         const res = await fetch('/api/generate?type=recaps', {
             method: 'GET',
         });

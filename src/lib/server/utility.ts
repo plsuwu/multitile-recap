@@ -72,7 +72,6 @@ const buildAuthorizedHeader = (
 		});
 	}
 
-	// console.log(headers);
 	return headers;
 };
 

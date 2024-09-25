@@ -1,9 +1,6 @@
 <script lang="ts">
     export let e: string | undefined;
-
     $: error = parseError(e);
-
-    console.log(e);
 
     function parseError(error: string | undefined) {
         if (!error) {
@@ -41,7 +38,6 @@
             default:
                 if (error.includes('wait')) {
                     const timer = error.split('%20')[0].split(' ')[1];
-                    console.log('timer:', timer);
                     return `Refresh unavailable for another ${timer} seconds.`;
                 }
 
