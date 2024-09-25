@@ -1,5 +1,6 @@
 <script lang="ts">
 	import '../app.css';
+	import Footer from '@components/Footer/Footer.svelte';
 </script>
 
 <head>
@@ -19,6 +20,11 @@
 	/>
 </head>
 
-<div class="flex flex-row items-center justify-center">
-	<slot />
+<div class="flex min-h-screen flex-col">
+	<div class="flex min-h-full flex-1 flex-row items-center justify-center">
+		<slot />
+	</div>
+    <div class='mt-24'>
+		<Footer />
+	</div>
 </div>

@@ -63,10 +63,16 @@ export const POST = async (event: RequestEvent): Promise<Response> => {
     worker.writeTempAuth(userId, token);
     worker.close();
 
-    return new Response(JSON.stringify({ ok: true }), {
-        status: 200,
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
+    return new Response(
+        JSON.stringify({
+            error: false,
+            message: null
+        }),
+        {
+            status: 200,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }
+    );
 };

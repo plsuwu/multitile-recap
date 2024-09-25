@@ -1,9 +1,9 @@
-import { CacheData, type TwitchUser } from '@/lib/types';
+import type { TwitchUser } from '$lib/types';
+import type { RequestEvent } from '@sveltejs/kit';
 import { twitch, lucia } from '@server/auth';
 import RedisCacheWorker from '@server/cache';
 import { buildAuthorizedHeader } from '@server/utility';
-import { redirect, type RequestEvent } from '@sveltejs/kit';
-import { OAuth2RequestError, Twitch } from 'arctic';
+import { OAuth2RequestError } from 'arctic';
 import { generateIdFromEntropySize } from 'lucia';
 
 const HELIX = {
@@ -56,8 +56,6 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
         const user = await userRequest.json();
         const twitchUser = user.data[0];
         const exists = await worker.readTwitchUser(twitchUser.id);
-
-        console.log(exists);
 
         if (exists) {
 
@@ -112,12 +110,18 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
         }
 
         await worker.close();
-        return new Response(null, {
-            status: 302,
-            headers: {
-                Location: '/',
+        return new Response(
+            JSON.stringify({
+                error: false,
+                message: null
+            }),
+            {
+                status: 302,
+                headers: {
+                    Location: '/',
+                }
             }
-        });
+        );
 
     } catch (err) {
         worker.close();
@@ -148,7 +152,7 @@ export const GET = async (event: RequestEvent): Promise<Response> => {
             {
                 status: 302,
                 headers: {
-                    Location: '/?err=unhandled',
+                    Location: '/?err=unhandled%20error',
                 }
             }
         );

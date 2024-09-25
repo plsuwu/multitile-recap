@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const displayName = locals.user?.display_name;
 
 	if (!access || !sessionId || !twitchId || !userId || !displayName) {
-		redirect(307, '/');
+		redirect(300, '/?err=missing%20credentials');
 	}
 
 	return {

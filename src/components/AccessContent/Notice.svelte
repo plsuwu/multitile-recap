@@ -29,33 +29,36 @@
 			<div class="my-3 border-b border-black/10"></div>
 			<p class="mb-1 text-base font-semibold">credential storage</p>
 			<p>
-				This application only intends to retain the "legitimate" OAuth
-				tokens (which are scoped only to read information about your
-				follows and subscriptions), alongside the associated following,
-				subscription, and recap data we fetch. This is cached until your
-				OAuth token needs to be refreshed. We otherwise purge this <samp
+				This application only retains the "legitimate" OAuth tokens
+				(which are scoped only to read information about your follows
+				and subscriptions), alongside the associated following,
+				subscription, and recap data we fetch. This data is cached on
+				the server to reduce the number and size of requests that we
+				need to make to the Twitch API.
+				<br />
+				We otherwise purge the
+				<samp
 					class="whitespace-nowrap rounded-xl bg-black/30 px-1 text-xs"
 				>
 					protected_login</samp
-				> token as quickly as reasonably possible, meaning we flush it after
-				either:
+				> token as quickly as is reasonably possible - it is flushed from
+				our server after either:
 			</p>
 			<ul class="list-inside list-disc flex-col indent-6">
-				<li>An attempt to fetch recap data is made; or,</li>
-				<li>Two minutes has elapsed since the token was submitted,</li>
+				<li>an attempt to fetch recap data is made; or,</li>
+				<li>two minutes has elapsed since the token was submitted;</li>
 			</ul>
-			<p>whichever comes first.</p>
+			<p class="pt-1">Whichever comes first.</p>
 			<div class="my-3 border-b border-black/10"></div>
-			<p class="mb-1 text-base font-semibold">how this token is used</p>
+			<p class="mb-1 text-base font-semibold">token usage</p>
 			<p>
 				Twitch pulls Recap data from <samp
 					class="whitespace-nowrap rounded-xl bg-black/30 px-1 text-xs"
 				>
 					https://gql.twitch.tv/
 				</samp>
-				- though does not provide the correct OAuth scopes to facilitate
-				access to a specific field required to build a subscription recap
-				-
+				- though the available OAuth scopes can't be used to request access
+				to a specific field required to build a subscription recap -
 				<samp
 					class="whitespace-nowrap rounded-xl bg-black/30 px-1 text-xs"
 				>
@@ -64,12 +67,12 @@
 				engagement (i.e, minutes/streamed watched, chats sent, etc). This
 				is obviously integral to generating a recap card grid.
 			</p>
-			<div class="my-3 border-b border-black/10"></div>
+			<div class="mt-3 mb-8 border-b border-black/10"></div>
 			<p>
-				If you wish, this application's source code and commit history
+				This application's source code and commit history
 				can be found at
 				<a
-					href="https://github.com/plsuwu/multitile-recap"
+					href="https://github.com/plsuwu/recap-tiles"
 					target="blank"
 					referrerpolicy="no-referrer"
 					class="text-blue-500 underline transition-all duration-200 hover:brightness-50"

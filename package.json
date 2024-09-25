@@ -1,6 +1,6 @@
 {
-	"name": "mtg-inmem",
-	"version": "0.0.1",
+	"name": "recap-tiles",
+	"version": "0.1.2",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",

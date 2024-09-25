@@ -38,8 +38,13 @@ async function fetchFollows(
             method: 'GET',
             headers: headers,
         });
+
         const body: FollowsResponse = await following.json();
-        console.log(body);
+        if (!following.ok) {
+            console.error(following.status, body);
+            return;
+        }
+
 
         // recursively call and merge to build out the `data` field until it
         // is the same length as twitch describes in the `total` field

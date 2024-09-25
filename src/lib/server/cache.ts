@@ -1,6 +1,5 @@
 import { createClient, type RedisClientType } from 'redis';
 import { RedisAdapter } from './redis';
-import type { TwitchUser } from '../types';
 
 const REDIS_URL = 'redis://localhost:6379';
 

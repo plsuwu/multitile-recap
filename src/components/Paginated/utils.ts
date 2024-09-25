@@ -49,6 +49,7 @@ export const paginate = (
 	totalPages.set(paginated.length);
 	return paginated;
 };
+//  --------------------------
 
 // return more accurate results by slicing haystack into windows with size of needle.length
 const getMinDistance = (needle: string, haystack: string): number => {

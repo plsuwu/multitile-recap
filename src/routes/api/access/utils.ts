@@ -21,7 +21,7 @@ export const tokenIsValid = async (
 		},
 	];
 
-	const headers = buildAuthorizedHeader(token, true, true, TWITCH_CLIENT_ID, [
+	const headers = buildAuthorizedHeader(token, true, TWITCH_CLIENT_ID, [
 		{ 'Content-Type': 'application/json' },
 		{ accept: '*/*' },
 		{ Host: 'gql.twitch.tv' },
