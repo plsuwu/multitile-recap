@@ -9,7 +9,7 @@
 	import HeroiconsArrowSmallRight from '~icons/heroicons/arrow-small-right';
 
 	const { display_name, profile_image_url, color } = $page.data;
-	const e = $page.url.searchParams.get('err');
+	$: e = $page.url.searchParams.get('err');
 	$: r = $page.url.searchParams.get('r');
 
 	$: refreshing = false;

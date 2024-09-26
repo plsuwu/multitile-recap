@@ -17,7 +17,7 @@
 				be giving this token to me). With this said, the provided
 				token's validity can be revoked very easily by either logging
 				out of the session that the token was pulled from, or clicking
-				the "Sign Out Everywher" button on
+				the "Sign Out Everywhere" button on
 				<a
 					href="https://www.twitch.tv/settings/security"
 					target="_blank"
@@ -36,7 +36,7 @@
 				the server to reduce the number and size of requests that we
 				need to make to the Twitch API.
 				<br />
-				We otherwise purge the
+				We otherwise purge your
 				<samp
 					class="whitespace-nowrap rounded-xl bg-black/30 px-1 text-xs"
 				>
@@ -56,28 +56,32 @@
 					class="whitespace-nowrap rounded-xl bg-black/30 px-1 text-xs"
 				>
 					https://gql.twitch.tv/
-				</samp>
-				- though the available OAuth scopes can't be used to request access
-				to a specific field required to build a subscription recap -
+				</samp>. The OAuth scopes available through Twitch don't
+				facilitate access to the
 				<samp
 					class="whitespace-nowrap rounded-xl bg-black/30 px-1 text-xs"
 				>
 					self
-				</samp> - which contains user-specific details on monthly channel
-				engagement (i.e, minutes/streamed watched, chats sent, etc). This
-				is obviously integral to generating a recap card grid.
+				</samp> field of a Recap request. This field contains user-specific
+				details on monthly channel engagement (i.e, minutes/streamed watched,
+				chats sent, etc), which is obviously integral to generating a recap
+				card grid. We are therefore making this one API request using the
+				token, deleting it from the server, and caching the data from a successful
+				response.
 			</p>
-			<div class="mt-3 mb-8 border-b border-black/10"></div>
+			<div class="mb-8 mt-3 border-b border-black/10"></div>
 			<p>
-				This application's source code and commit history
-				can be found at
+				This application's source code and commit history can be found
+				at
 				<a
-					href="https://github.com/plsuwu/recap-tiles"
+					href="https://github.com/plsuwu/tiles"
 					target="blank"
 					referrerpolicy="no-referrer"
 					class="text-blue-500 underline transition-all duration-200 hover:brightness-50"
 					>github.com/plsuwu</a
-				> for review.
+				> for review if you want to validate this application's authenticity
+				- though you still have to trust that this server is actually running
+				that code.
 			</p>
 		</div>
 	</span>

@@ -11,8 +11,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const displayName = locals.user?.display_name;
     const color = locals.user?.color;
 
-	if (!access || !sessionId || !twitchId || !userId || !displayName || !color) {
-		redirect(300, '/?err=missing%20credentials');
+	if (!access || !sessionId || !twitchId || !userId || !displayName) {
+		redirect(307, '/?err=missing%20credentials');
 	}
 
 	return {
