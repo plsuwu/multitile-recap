@@ -19,11 +19,12 @@ FROM base AS release
 COPY --from=install /tmp/prod/node_modules node_modules
 COPY --from=prerelease /usr/src/tiles .
 
-ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /usr/local/bin/wait-for-it
+ADD --chown=bun:bun wait-for-it /usr/local/bin/wait-for-it
 RUN chmod +x /usr/local/bin/wait-for-it
 
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
 
+USER bun
 EXPOSE 3000/tcp
 # `ENTRYPOINT` defined in compose.yaml
