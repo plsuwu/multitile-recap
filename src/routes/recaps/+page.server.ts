@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 
     if (!res.ok) {
         console.error('[!] Err: ', body);
-        redirect(300, body.location);
+        redirect(302, body.location);
     }
 
     const worker = new RedisCacheWorker({});
