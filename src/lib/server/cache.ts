@@ -1,7 +1,10 @@
+import { REDIS_CONTAINER } from '$env/static/private';
 import { createClient, type RedisClientType } from 'redis';
 import { RedisAdapter } from './redis';
 
-const REDIS_URL = 'redis://localhost:6379';
+console.log(process.env.DOCKER_PRODUCTION);
+const REDIS_URL = process.env.DOCKER_PRODUCTION ? REDIS_CONTAINER : 'redis://localhost:6379';
+
 
 export const luciaClient = await createClient({ url: REDIS_URL }).connect();
 export const adapter = new RedisAdapter({ client: luciaClient });
