@@ -1,4 +1,4 @@
-# Multi-tile Recaps
+# tiles: tiled monthly twitch subscription recaps 
 
 Uses Twitch's [**REDACTED**] API to collate all of your subscription recaps into
 a single tiling grid layout:
