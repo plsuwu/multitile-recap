@@ -14,7 +14,7 @@
 			referrerpolicy="no-referrer"
 		>
 			<div>[</div>
-			<div>tiled</div>
+			<div>tiles</div>
 			<div>@</div>
 			<div><MdiGithub /></div>
 			<div>]</div>
