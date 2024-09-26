@@ -8,7 +8,7 @@
 >
 	<div class="flex flex-row items-center">
 		<a
-			href="https://github.com/plsuwu/multitile-recap"
+			href="https://github.com/plsuwu/tiles"
 			class="flex flex-row items-center space-x-2 font-semibold hover:brightness-50"
 			target="_blank"
 			referrerpolicy="no-referrer"
