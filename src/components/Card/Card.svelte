@@ -4,8 +4,9 @@
 	import CardContent from './CardContent.svelte';
 
 	export let recap: RecapsQueryResponse;
+	export let displayName: string;
 </script>
 
 <CardContainer>
-	<CardContent {recap}></CardContent>
+	<CardContent {recap} {displayName} />
 </CardContainer>

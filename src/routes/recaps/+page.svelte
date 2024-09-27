@@ -5,6 +5,8 @@
 	import Modal from '@components/Modal/Modal.svelte';
 
 	const recaps = $page.data.recaps;
+    const displayName = $page.data.display_name;
+
 	let filtered: (string | undefined)[] = [];
 	let usingRecaps: RecapsQueryResponse[] = recaps
 		.map((recap: any) => {
@@ -102,7 +104,7 @@
 						<div
 							class="flex w-full flex-1 justify-around justify-self-end bg-gradient-to-t from-[#facdc8] via-[#bf94ff] via-[#fab4ff] to-[#a3c1ff] px-[20px] py-[20px] text-[#efeff1]"
 						>
-							<Card {recap} />
+							<Card {recap} {displayName} />
 						</div>
 					{/each}
 				</div>

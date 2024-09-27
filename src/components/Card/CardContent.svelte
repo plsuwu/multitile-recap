@@ -3,7 +3,7 @@
 	import Twitch from './Twitch.svg?raw';
 
 	export let recap: RecapsQueryResponse;
-	// export let user: string;
+	export let displayName: string;
 
 	const formatted = (time: number) => {
 		const days = Math.floor(time / 1440);
@@ -31,7 +31,6 @@
 
 	const { streamsPlayed } = recap.data.user.self.recap;
 	const { streamsStreamed } = recap.data.channel.recap;
-	let user = 'plss';
 </script>
 
 <div
@@ -46,7 +45,7 @@
 				class="my-4 size-[167px] self-center rounded-full"
 			/>
 			<div class="text-[#fab4ff]">
-				{user} x {recap.data.user.displayName}
+				{displayName} x {recap.data.user.displayName}
 			</div>
 		</div>
 		<div class="mt-[50px] flex flex-row justify-around">
