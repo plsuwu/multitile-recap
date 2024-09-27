@@ -13,8 +13,8 @@
 			<p>
 				Yes, this type of token probably provides unreasonably extensive
 				access to your account, and you kind of just have to trust that
-				I'm not doing anything nefarious (meaning you probably shouldn't
-				be giving this token to me). With this said, the provided
+				I'm not doing anything nefarious (you probably shouldn't
+				be giving this token to this site). With this said, the provided
 				token's validity can be revoked very easily by either logging
 				out of the session that the token was pulled from, or clicking
 				the "Sign Out Everywhere" button on
@@ -29,7 +29,7 @@
 			<div class="my-3 border-b border-black/10"></div>
 			<p class="mb-1 text-base font-semibold">credential storage</p>
 			<p>
-				This application only retains the "legitimate" OAuth tokens
+				This server only retains the "legitimate" OAuth tokens
 				(which are scoped only to read information about your follows
 				and subscriptions), alongside the associated following,
 				subscription, and recap data we fetch. This data is cached on
@@ -56,22 +56,22 @@
 					class="whitespace-nowrap rounded-xl bg-black/30 px-1 text-xs"
 				>
 					https://gql.twitch.tv/
-				</samp>. The OAuth scopes available through Twitch don't
-				facilitate access to the
+				</samp>. The OAuth scopes available through Twitch aren't capable of
+				facilitatating access to the
 				<samp
 					class="whitespace-nowrap rounded-xl bg-black/30 px-1 text-xs"
 				>
 					self
 				</samp> field of a Recap request. This field contains user-specific
-				details on monthly channel engagement (i.e, minutes/streamed watched,
+				data on monthly channel engagement (i.e, minutes/streamed watched,
 				chats sent, etc), which is obviously integral to generating a recap
-				card grid. We are therefore making this one API request using the
-				token, deleting it from the server, and caching the data from a successful
-				response.
+				card. We are therefore making this one API request using the
+				token, deleting it from the server and caching the response data from
+				a successful query.
 			</p>
 			<div class="mb-8 mt-3 border-b border-black/10"></div>
 			<p>
-				This application's source code and commit history can be found
+				This site's source code and commit history can be found
 				at
 				<a
 					href="https://github.com/plsuwu/tiles"
@@ -79,9 +79,7 @@
 					referrerpolicy="no-referrer"
 					class="text-blue-500 underline transition-all duration-200 hover:brightness-50"
 					>github.com/plsuwu</a
-				> for review if you want to validate this application's authenticity
-				- though you still have to trust that this server is actually running
-				that code.
+				>.
 			</p>
 		</div>
 	</span>
