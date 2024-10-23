@@ -1,15 +1,12 @@
-import 'unplugin-icons/types/svelte';
-
+// See https://svelte.dev/docs/kit/types#app
+// for information about these interfaces
 declare global {
 	namespace App {
-		interface Locals {
-			user: import('lucia').User | null;
-			session: import('lucia').Session | null;
-		}
-	}
-
-	namespace Lucia {
-		type Auth = import('@server/auth/lucia').Auth;
+		// interface Error {}
+		// interface Locals {}
+		// interface PageData {}
+		// interface PageState {}
+		// interface Platform {}
 	}
 }
 
