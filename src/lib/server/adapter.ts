@@ -1,27 +1,16 @@
 import type {
     Adapter,
     DatabaseSession,
-    DatabaseUser,
+    DatabaseUser
     // RegisteredDatabaseUserAttributes
 } from 'lucia';
 import type { RedisClientType, RedisFunctions, RedisModules, RedisScripts } from 'redis';
 import RedisCacheWorker, { KeyType } from '$lib/server/cache';
+import type { CachedUser } from '$lib/types';
 
 interface RedisAdapterOptions {
     client: RedisClientType<RedisModules, RedisFunctions, RedisScripts>;
     prefix?: string;
-}
-
-interface CachedUserAttributes {
-    id: string;
-    twitch_id: string;
-    login: string;
-    display_name: string;
-    profile_image_url: string;
-    color: string;
-    access: string;
-    refresh: string;
-    refresh_after: string;
 }
 
 const KEY_TYPE = {
@@ -83,23 +72,25 @@ export class RedisAdapter implements Adapter {
         sessionId: string
     ): Promise<[session: DatabaseSession | null, user: DatabaseUser | null]> {
         const worker = new RedisCacheWorker({});
+
+        console.log(`[*] Searching for key '${this.prefix}:${sessionId}:<id>'`);
         const sessionString = await this.instance.get(this.sessionKey(sessionId));
+
         if (!sessionString) {
             return [null, null];
         }
 
+        console.log(sessionString);
+
         const session = this.asDatabaseSession(sessionString);
-        const data: CachedUserAttributes | null = await worker.readData<CachedUserAttributes>(
-            session.userId,
-            KeyType.User,
-        );
+        const data: CachedUser | null = await worker.readData<CachedUser>(session.userId, KeyType.Data);
 
         if (!data) {
             return [null, null];
         }
         const user: DatabaseUser = {
-            id: session.userId,
-            attributes: { ...data }
+            id: session.id,
+            attributes: { ...data },
         };
 
         worker.close();
@@ -125,6 +116,8 @@ export class RedisAdapter implements Adapter {
     }
 
     async setSession(session: DatabaseSession): Promise<void> {
+        console.log(`[+] would do SET ${session.id}:${JSON.stringify(session)}`);
+        console.log(`[+] would do sAdd user:${session.userId}:${session.id}`);
         await this.instance
             .multi()
             .set(this.sessionKey(session.id), JSON.stringify(session), {
@@ -142,7 +135,7 @@ export class RedisAdapter implements Adapter {
 
         const session = this.asDatabaseSession(sessionString);
         session.expiresAt = expiresAt;
-
+        console.log(sessionId, session);
         await this.instance.set(this.sessionKey(sessionId), JSON.stringify(session), {
             PX: this.msUntil(expiresAt)
         });

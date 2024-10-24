@@ -12,17 +12,17 @@ export interface CacheConfig {
     ttl?: number; // ttl in secs
 }
 
-
 const test_data = {
     field_one: 'this is field one content',
-    field_two: 'this is field two content',
-}
+    field_two: 'this is field two content'
+};
 
 export enum KeyType {
     User,
     Ttv,
     Data,
-    Auth
+    Auth,
+    Session,
 }
 
 class RedisCacheWorker {
@@ -56,9 +56,18 @@ class RedisCacheWorker {
 
     async readData<T>(id: string, keyType: KeyType): Promise<T | null> {
         const key = this.getKey(keyType, id);
-        const data = await this.client.hGetAll(key);
+        let data;
+        if (keyType === KeyType.Ttv) {
+            console.log('TTV KEYTYPE');
+            data = await this.client.get(key);
+        } else {
+            data = await this.client.hGetAll(key);
+        }
 
-        if (Object.keys(data).length === 0) {
+
+        console.log('[*] READING DATA: ', data, `(WITH KEY ${key} | ID ${id})`);
+
+        if (typeof data === 'object' && data !== null && Object.keys(data).length === 0) {
             return null;
         }
         return data as T;
@@ -75,6 +84,17 @@ class RedisCacheWorker {
     //
     //     return auth;
     // }
+    //
+    // [+] Objects: k => id v => h3sejup7ap5oisk3
+    // [+] Writing id: 'h3sejup7ap5oisk3' to cache
+    // [+] Object:
+    //      key => ttv_user,
+    //      value => {
+    //          id: '103033809',
+    //          login: 'username',
+    //          display_name: 'user'
+    //      }
+    // [+] Writing ttv_user: '[object Object]' to cache
 
     // async writeGlobalToken(id: string, auth: string): Promise<void> {
     //     const key = this.getKey(KeyType.Auth, id);
@@ -86,14 +106,19 @@ class RedisCacheWorker {
     async writeData<T extends Record<string, any>>(
         id: string,
         type: KeyType,
-        data: T,
+        data: T
     ): Promise<void> {
         const key = this.getKey(type, id);
+        console.log(key, type, id, data);
         await Promise.all(
             Object.entries(data).map(async ([k, v]) => {
-
-                console.log(`[+] Writing ${k}: '${v}' to cache`);
-                await this.client.hSet(key, k, v);
+                console.log(key, type, id, data, k, v);
+                if (typeof v === 'object' && v !== null) {
+                    await this.client.hSet(`${key}:${k}`, { ...v });
+                } else {
+                    console.log(`SET ${key}:${v}`);
+                    await this.client.set(key, v);
+                }
             })
         );
     }

@@ -14,7 +14,7 @@ export const lucia = new Lucia(adapter, {
     },
     getUserAttributes: (attr) => {
         return {
-            ttv_user: { ...attr.ttv_user },
+            ttv: { ...attr.ttv },
             tokens: { ...attr.tokens }
         };
     }
@@ -25,7 +25,7 @@ declare module 'lucia' {
         Lucia: typeof lucia;
         DatabaseUserAttributes: {
             id: string;
-            ttv_user: {
+            ttv: {
                 id: string;
                 login: string;
                 display_name: string;
