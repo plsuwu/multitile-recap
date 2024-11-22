@@ -1,0 +1,231 @@
+import redis from '$redis';
+import { sha256 } from '@oslojs/crypto/sha2';
+import { encodeHexLowerCase } from '@oslojs/encoding';
+
+import { twitch } from './provider';
+import { log } from '$logging';
+import { SESSION } from '$logging/constants';
+import { OAuth2RequestError, type OAuth2Tokens } from 'arctic';
+import { helix } from '$helix';
+import { PASSPORT } from '$server/helix/utils';
+
+export interface SessionData {
+    user_id: string;
+    session_expiry: number;
+    revalidate_access: number;
+}
+
+export interface TwitchTokens {
+    access: string;
+    refresh: string;
+    expiry: number;
+}
+
+// export interface User {
+// }
+
+export interface Session {
+    user: any | null; // get the type from dev.twitch refs
+    tokens: TwitchTokens | null;
+    session: SessionData | null;
+}
+
+const DEFAULT_EXPIRY_FULL = 1000 * 60 * 60 * 30;
+const DEFAULT_EXPIRY_HALF = 1000 * 60 * 60 * 15;
+const DEFAULT_REVALIDATE = 1000 * 60 * 60 * 4;
+const NULL_SESSION: Session = {
+    user: null,
+    tokens: null,
+    session: null
+};
+
+/**
+ * Creates a lowercase hex representation of a SHA256 hash of a user's cookie token
+ * @param token - Unhashed session token
+ * @returns SHA256 hash of input string
+ */
+const getSessionTokenHash = (token: string) => {
+    return encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
+};
+
+/**
+ * Adds a new entry under a given hashed session id
+ * @param sessionId - Hash of a user's session token
+ * @param session - The session object to be cached
+ */
+async function setSession(sessionId: string, session: SessionData) {
+    const key = `session:${sessionId}`;
+    const pipeline = redis.redis.pipeline();
+
+    pipeline.hmset(key, { ...session });
+    pipeline.pexpire(key, session.session_expiry);
+    await pipeline.exec();
+}
+
+async function persistSession(
+    sessionId: string,
+    newExpiry?: number,
+    newRevalidation?: number
+) {
+    // if neither a new expiry nor revalidation timestamp are passed, return immediately
+    if (!newExpiry && !newRevalidation) {
+        return;
+    }
+
+    const key = `session:${sessionId}`;
+    const pipeline = redis.redis.pipeline();
+
+    if (newRevalidation) {
+        log.info(SESSION(sessionId).GENERAL.PERSISTING_REVALIDATE);
+        pipeline.hset(key, { revalidate_access: newRevalidation });
+    }
+
+    if (newExpiry) {
+        log.info(SESSION(sessionId).GENERAL.PERSISTING_REFRESH);
+        pipeline.hset(key, { session_expiry: newExpiry });
+        pipeline.pexpire(key, newExpiry);
+    }
+
+    await pipeline.exec();
+}
+
+async function deleteSession(sessionId: string) {
+    const key = `session:${sessionId}`;
+    await redis.redis.del(key);
+}
+
+/**
+ * invalidates a session by deleting it from the cache
+ * @param acccess - Twitch-issued OAuth2 access token
+ * @param sessionId - Hash of a user's session token
+ */
+export async function invalidateSession(sessionId: string, access: string) {
+    // await revokeAccess(access);
+    await deleteSession(sessionId);
+}
+
+export async function createSession(token: string, userId: string) {
+    const sessionId = getSessionTokenHash(token);
+    const session: SessionData = {
+        user_id: userId,
+        session_expiry: Date.now() + 1000 * 60 * 60 * 24 * 30, // 30 days
+        revalidate_access: Date.now() + 1000 * 60 * 60 * 4 // revalidate access token every four hours
+    };
+
+    // we probably dont care to await this asynchronous call as we
+    // return the session data directly, so we shouldn't need to read
+    // this straight away (?)
+    setSession(sessionId, session);
+    return session;
+}
+
+export async function validateSession(token: string): Promise<Session> {
+    let recache = true;
+    const sessionId = getSessionTokenHash(token);
+    const cache = await redis.getSession<SessionData | null>(sessionId);
+
+    /**
+     * cached session data check
+     */
+    if (!cache) {
+        log.info(SESSION(sessionId).GENERAL.CACHE_MISS_SESSION);
+        return NULL_SESSION;
+    }
+
+    /**
+     * cached session expiry check
+     */
+    if (Date.now() >= cache.session_expiry) {
+        log.info(SESSION(sessionId).GENERAL.EXPIRED);
+        deleteSession(sessionId);
+        return NULL_SESSION;
+    }
+    if (Date.now() >= cache.session_expiry - DEFAULT_EXPIRY_HALF) {
+        log.info(SESSION(sessionId).GENERAL.PERSIST);
+
+        // set a persisted session
+        cache.session_expiry = Date.now() + DEFAULT_EXPIRY_FULL;
+        recache = true;
+    }
+
+    /**
+     * cached user, tokens data check
+     */
+    let { user, tokens } = await redis.getUserData<Partial<Session>>(sessionId);
+    if (!user || !tokens) {
+        log.info(SESSION(sessionId).GENERAL.CACHE_MISS_USER);
+        return NULL_SESSION;
+    }
+
+    /**
+     * cached tokens expiry check
+     */
+    if (Date.now() >= tokens.expiry) {
+        log.info(SESSION(sessionId).GENERAL.REQUIRE_REFRESH);
+        log.debug('curr:', new Date(), '\ntoken:', new Date(tokens.expiry));
+
+        let newTokens: OAuth2Tokens;
+        try {
+            newTokens = await twitch.refreshAccessToken(tokens.refresh);
+            tokens = {
+                refresh: newTokens.refreshToken(),
+                access: newTokens.accessToken(),
+                expiry: newTokens.accessTokenExpiresAt().getTime()
+            };
+
+            recache = true;
+        } catch (err) {
+            if (err instanceof OAuth2RequestError) {
+                log.error(SESSION(sessionId).ERROR.REFRESH_OAUTH2);
+            } else {
+                log.error(SESSION(sessionId).ERROR.UNHANDLED);
+            }
+            await deleteSession(sessionId);
+            return NULL_SESSION;
+        }
+    }
+
+    /**
+     * cached token validity check
+     */
+    if (Date.now() >= cache.revalidate_access) {
+        log.info(SESSION(sessionId).GENERAL.REQUIRE_REVALIDATE);
+        log.debug('curr:', new Date(), '\ntoken:', new Date(tokens.expiry));
+
+        const headers = helix.authorizedHeadersFrom(tokens.access);
+        const revalidateResponse = await fetch(PASSPORT.VALIDATE, {
+            method: 'GET',
+            headers: headers
+        });
+
+        // should refresh token
+        if (revalidateResponse.status === 401) {
+            log.error(SESSION(sessionId).ERROR.REVALIDATION_UNAUTHORIZED);
+
+            // this shouldn't happen so i won't bother handling this for now
+            return NULL_SESSION;
+        } else if (!revalidateResponse.ok) {
+            log.error(
+                SESSION(sessionId).ERROR.UNHANDLED(
+                    new Error(
+                        `${revalidateResponse.status} - ${revalidateResponse.statusText}`
+                    )
+                )
+            );
+        }
+
+        cache.revalidate_access = Date.now() + DEFAULT_REVALIDATE;
+        recache = true;
+    }
+
+    if (recache) {
+        // dont bother awaiting this promise as we return an object directly
+        persistSession(sessionId, cache.session_expiry, cache.revalidate_access);
+    }
+
+    return {
+        user,
+        tokens,
+        session: cache,
+    }
+}

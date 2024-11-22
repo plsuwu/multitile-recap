@@ -1,33 +1,68 @@
-import { lucia } from '$lib/server/auth';
-import { redirect, type Handle } from '@sveltejs/kit';
+import { session as s } from '$auth';
+import { deleteSessionCookie, setSessionCookie } from '$auth/cookie';
+import { log } from '$logging';
+import { HOOK } from '$logging/constants';
+import type { Handle } from '@sveltejs/kit';
+import { sequence } from '@sveltejs/kit/hooks';
 
-export const handle: Handle = async ({ event, resolve }) => {
-    const sessionId = event.cookies.get(lucia.sessionCookieName);
-    if (!sessionId) {
+function logPrefix(
+    routeId: string | null,
+    type: 'update' | 'error',
+    id?: string
+) {
+    const eventType = type === 'update' ? '+' : '!';
+    const message = `[${eventType}] ['${routeId}']`.padEnd(27, ' ');
+
+    return message;
+}
+
+const authHandle: Handle = async ({ event, resolve }) => {
+    const routeId = event.route.id ?? '**UNKNOWN_RT**';
+    log.info(HOOK(routeId).GENERAL.HOOK_START);
+    const token = event.cookies.get('_session') ?? null;
+    if (token === null) {
+        log.debug(HOOK(routeId).GENERAL.UNSET_COOKIE);
+        log.debug(HOOK(routeId).GENERAL.HOOK_END('NO_SESSION_COOKIE'));
+
         event.locals.user = null;
+        event.locals.tokens = null;
         event.locals.session = null;
 
         return resolve(event);
+    } else if (!token) {
+        log.error(HOOK(routeId).GENERAL.UNDEFINED_COOKIE_VALUE);
+        log.error(HOOK(routeId).GENERAL.HOOK_END('MALFORMED_SESSION_TOKEN'));
+
+        event.locals.user = null;
+        event.locals.tokens = null;
+        event.locals.session = null;
+
+        deleteSessionCookie(event);
+        return resolve(event);
     }
 
-    const { session, user } = await lucia.validateSession(sessionId);
-    if (session && session.fresh) {
-        const sessionCookie = lucia.createSessionCookie(session.id);
-        event.cookies.set(sessionCookie.name, sessionCookie.value, {
-            path: '.',
-            ...sessionCookie.attributes,
-        });
+    let { user, tokens, session } = await s.validateSession(token);
+    if (session === null) {
+        log.debug(HOOK(routeId).GENERAL.INVALID_SESSION);
+        deleteSessionCookie(event);
+    } else {
+        try {
+            setSessionCookie(event, token, new Date(session.session_expiry));
+        } catch (err) {
+            log.debug(HOOK(routeId).ERROR.SETTING_COOKIE(err as Error));
+            deleteSessionCookie(event);
+
+            log.debug(HOOK(routeId).GENERAL.HOOK_END('MALFORMED_SESSION_TOKEN'));
+            return resolve(event);
+        }
+        event.locals.user = user;
+        event.locals.tokens = tokens;
+        event.locals.session = session;
+        log.debug(HOOK(routeId).GENERAL.SESSION_OK);
     }
 
-    if (!session) {
-        const sessionCookie = lucia.createBlankSessionCookie();
-        event.cookies.set(sessionCookie.name, sessionCookie.value, {
-            path: '.',
-            ...sessionCookie.attributes,
-        });
-    }
-
-    event.locals.user = user;
-    event.locals.session = session;
+    log.debug(HOOK(routeId).GENERAL.HOOK_END('OK'));
     return resolve(event);
-}
+};
+
+export const handle = sequence(authHandle);

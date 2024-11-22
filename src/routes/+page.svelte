@@ -1,9 +1,6 @@
-<script lang='ts'>
-    import { generateOauth } from '$lib/internal';
-
-
+<script lang="ts">
 </script>
 
-<button on:click={generateOauth} >
-    oauth
-</button>
+
+
+

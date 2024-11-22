@@ -1,16 +1,19 @@
-import 'unplugin-icons/types/svelte';
+import type { session } from "$auth";
+import type { Twitch } from "arctic";
+// import 'unplugin-icons/types/svelte';
+
 
 declare global {
 	namespace App {
 		interface Locals {
-			user: import('lucia').User | null;
-			session: import('lucia').Session | null;
+            user: any | null,
+            tokens: session.SessionTokens | null,
+            session: session.SessionData | null,
+            syncStatus: Promise<any | any[]>,
 		}
-	}
-
-	namespace Lucia {
-		type Auth = import('@server/auth/lucia').Auth;
 	}
 }
 
 export {};
+
+
