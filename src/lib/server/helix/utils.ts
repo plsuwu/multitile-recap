@@ -7,18 +7,18 @@ export const HELIX = {
 	BADGES: 'https://api.twitch.tv/helix/chat/badges',
 	CHANNEL: 'https://api.twitch.tv/helix/channels',
 	FOLLOWED: 'https://api.twitch.tv/helix/channels/followed',
-	SUBSCRIPTIONS: 'https://api.twitch.tv/helix/subscriptions/user'
+	SUBSCRIPTIONS: 'https://api.twitch.tv/helix/subscriptions/user',
 };
 
 export const PASSPORT = {
 	OAUTH: 'https://id.twitch.tv/oauth2/token',
 	REVOKE: 'https://id.twitch.tv/oauth2/revoke',
-	VALIDATE: 'https://id.twitch.tv/oauth2/validate'
+	VALIDATE: 'https://id.twitch.tv/oauth2/validate',
 };
 
 export enum AuthorizationPrefix {
 	Bearer,
-	OAuth
+	OAuth,
 }
 
 /**
@@ -33,14 +33,14 @@ export function authorizedHeadersFrom(
 	token: string,
 	authType: AuthorizationPrefix = AuthorizationPrefix.Bearer,
 	client: string = TWITCH_CLIENT_ID,
-	extended: Record<string, string>[] | null = null
+	extended: Record<string, string>[] | null = null,
 ): Headers {
 	const authPrefix =
 		authType === AuthorizationPrefix.Bearer ? 'Bearer' : 'OAuth';
 
 	const headers: Headers = new Headers({
 		Authorization: `${authPrefix} ${token}`,
-		'Client-Id': client
+		'Client-Id': client,
 	});
 
 	if (extended) {

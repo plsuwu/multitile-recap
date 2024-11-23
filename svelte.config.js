@@ -1,6 +1,6 @@
 // import adapter from '@sveltejs/adapter-auto';
-import adapter from "svelte-adapter-bun";
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import adapter from 'svelte-adapter-bun';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -13,16 +13,17 @@ const config = {
 		// If your environment is not supported, or you settled on a specific environment, switch out the adapter.
 		// See https://svelte.dev/docs/kit/adapters for more information about adapters.
 		adapter: adapter(),
-        alias: {
-            $server: 'src/lib/server',
-            $auth: 'src/lib/server/auth',
-            $redis: 'src/lib/server/redis',
-            $pg: 'src/lib/server/postgres',
-            $logging: 'src/lib/logging',
-            $helix: 'src/lib/server/helix',
-            $gql: 'src/lib/server/gql',
-        }
-	}
+		alias: {
+			$server: 'src/lib/server',
+			$auth: 'src/lib/server/auth',
+			$redis: 'src/lib/server/redis',
+			$pg: 'src/lib/server/postgres',
+			$logging: 'src/lib/logging',
+			$types: 'src/lib/types',
+			$helix: 'src/lib/server/helix',
+			$gql: 'src/lib/server/gql',
+		},
+	},
 };
 
 export default config;

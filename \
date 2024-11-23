@@ -43,7 +43,7 @@ export const HOOK = (routeId: string, userId?: string) => {
 
 	const ERROR = {
 		SETTING_COOKIE: (error: Error) =>
-			`${prefix}: SET COOKIE UNKNOWN ERROR '${error.name}': '${error.message}'`,
+			`${prefix}: SET COOKIE UNKNOWN ERROR '${error.name}' - '${error.message}'`,
 	};
 
 	return {

@@ -1,6 +1,6 @@
 import {
 	REDIS_CONTAINER_HOST,
-	REDIS_CONTAINER_PORT
+	REDIS_CONTAINER_PORT,
 } from '$env/static/private';
 import { log } from '$logging';
 import { Redis } from 'ioredis';
@@ -23,7 +23,7 @@ export class RedisHandler {
 		this.redis = new Redis({
 			host: config.host,
 			port: config.port,
-			password: config.password
+			password: config.password,
 		});
 
 		this.ttl = config.ttl || 2592000; // key EX defaults to 30 days if no ttl set in config
@@ -45,21 +45,21 @@ export class RedisHandler {
 		return { user, tokens } as T;
 	}
 
-    /**
-     * Returns an associated session given a session id
-     * @param sessionId - Hash of a user's session token
-     * @returns A session object corresponding to the given sessionId, or null otherwise
-     */
-    public async getSession<T>(sessionId: string): Promise<T> {
-    	const key = this.getKey('session', sessionId);
+	/**
+	 * Returns an associated session given a session id
+	 * @param sessionId - Hash of a user's session token
+	 * @returns A session object corresponding to the given sessionId, or null otherwise
+	 */
+	public async getSession<T>(sessionId: string): Promise<T> {
+		const key = this.getKey('session', sessionId);
 
-    	const session = await redis.redis.hgetall(key);
-    	if (!session) {
-    		return null as T;
-    	}
+		const session = await redis.redis.hgetall(key);
+		if (!session) {
+			return null as T;
+		}
 
-    	return session as T;
-    }
+		return session as T;
+	}
 }
 
 export const redis = new RedisHandler({ host: REDIS_URL, port: REDIS_PORT });

@@ -2,13 +2,14 @@ import { session as s } from '$auth';
 import { deleteSessionCookie, setSessionCookie } from '$auth/cookie';
 import { log } from '$logging';
 import { HOOK } from '$logging/constants';
+
 import type { Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 
 function logPrefix(
     routeId: string | null,
     type: 'update' | 'error',
-    id?: string
+    id?: string,
 ) {
     const eventType = type === 'update' ? '+' : '!';
     const message = `[${eventType}] ['${routeId}']`.padEnd(27, ' ');
@@ -52,7 +53,9 @@ const authHandle: Handle = async ({ event, resolve }) => {
             log.debug(HOOK(routeId).ERROR.SETTING_COOKIE(err as Error));
             deleteSessionCookie(event);
 
-            log.debug(HOOK(routeId).GENERAL.HOOK_END('MALFORMED_SESSION_TOKEN'));
+            log.debug(
+                HOOK(routeId).GENERAL.HOOK_END('MALFORMED_SESSION_TOKEN'),
+            );
             return resolve(event);
         }
         event.locals.user = user;
