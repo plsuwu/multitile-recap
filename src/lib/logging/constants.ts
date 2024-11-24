@@ -29,8 +29,10 @@ export const SESSION = (hash: string) => {
 };
 
 export const HOOK = (routeId: string, userId?: string) => {
-	let prefix = `[hook '${routeId}'`;
-	prefix += userId ? `](${userId})` : ']';
+	let prefix = `[hook '${routeId}']`;
+	if (userId) {
+		prefix += `[id:${userId}]`;
+	}
 
 	const GENERAL = {
 		HOOK_START: `${prefix}: START HOOK`,
@@ -50,4 +52,10 @@ export const HOOK = (routeId: string, userId?: string) => {
 		GENERAL,
 		ERROR,
 	};
+};
+
+export const ERROR = (routeId: string, userId?: string) => {
+	let prefix = `[err '']`;
+
+	const UI = {};
 };

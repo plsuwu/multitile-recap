@@ -22,6 +22,8 @@ const config = {
 			$types: 'src/lib/types',
 			$helix: 'src/lib/server/helix',
 			$gql: 'src/lib/server/gql',
+			$components: 'src/components',
+            $client: 'src/lib/client',
 		},
 	},
 };

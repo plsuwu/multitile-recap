@@ -1,12 +1,19 @@
+import { makeEncodedPayload } from '$client/utils';
+import { TWITCH_CLIENT_ID } from '$env/static/private';
 import { helix } from '$helix';
 import { log } from '$logging';
 import { SESSION } from '$logging/constants';
 import redis from '$redis';
 import { PASSPORT } from '$server/helix/utils';
 import type { TwitchUser, TwitchTokens, SessionData, Session } from '$types';
+import { error, type RequestEvent } from '@sveltejs/kit';
+import { deleteSessionCookie } from './cookie';
 import { twitch } from './provider';
 import { sha256 } from '@oslojs/crypto/sha2';
-import { encodeHexLowerCase } from '@oslojs/encoding';
+import {
+	encodeBase32LowerCaseNoPadding,
+	encodeHexLowerCase,
+} from '@oslojs/encoding';
 import { OAuth2RequestError, type OAuth2Tokens } from 'arctic';
 
 const DEFAULT_EXPIRY_FULL = 1000 * 60 * 60 * 30;
@@ -84,9 +91,47 @@ async function deleteSession(sessionId: string) {
  * @param acccess - Twitch-issued OAuth2 access token
  * @param sessionId - Hash of a user's session token
  */
-export async function invalidateSession(sessionId: string, access: string) {
-	// await revokeAccess(access);
+export async function invalidateSession(event: RequestEvent) {
+    const sessionId = event.cookies.get('_session');
+
+
+    if (!event.locals.tokens || !event.locals.tokens.access || !sessionId) {
+        throw error(400, "Cannot logout")
+    }
+
+	const data = {
+		client_id: TWITCH_CLIENT_ID,
+		token: event.locals.tokens.access,
+	};
+
+	const response = await fetch(PASSPORT.REVOKE, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded'
+		},
+		body: makeEncodedPayload(data)
+	});
+
+	if (!response.ok) {
+		let errorReason = '';
+		if (response.status === 400) {
+			errorReason = 'invalid token';
+		} else if (response.status === 404) {
+			errorReason = 'client or user does not exist';
+		}
+
+		console.error(`[!] Unable to revoke token: ${errorReason} (${response.status})`);
+	}
+
+    deleteSessionCookie(event);
 	await deleteSession(sessionId);
+}
+
+export function generateSessionToken() {
+	const bytes = new Uint8Array(20);
+	crypto.getRandomValues(bytes);
+
+	return encodeBase32LowerCaseNoPadding(bytes);
 }
 
 /**
@@ -114,7 +159,9 @@ export async function validateSession(token: string): Promise<Session> {
 	let recache = true; // track if we should update cached expiry times
 
 	const sessionId = getSessionTokenHash(token);
-	const cache = await redis.getSession<SessionData | null>(sessionId);
+	const cache = await redis.getSessionFromCache<SessionData>(sessionId);
+
+    console.log(cache);
 
 	/**
 	 * cached session data check
@@ -141,8 +188,9 @@ export async function validateSession(token: string): Promise<Session> {
 	/**
 	 * cached user, tokens data check
 	 */
-	let { user, tokens }: { user: TwitchUser; tokens: TwitchTokens } =
-		await redis.getUserData<Partial<Session>>(sessionId);
+	let user = await redis.getUserFromCache<TwitchUser>(cache.user_id);
+	let tokens = await redis.getTokensFromCache<TwitchTokens>(cache.user_id);
+
 	if (!user || !tokens) {
 		log.info(SESSION(sessionId).GENERAL.CACHE_MISS_USER);
 		return NULL_SESSION;
@@ -206,14 +254,14 @@ export async function validateSession(token: string): Promise<Session> {
 			);
 		}
 
-        // update with next revalidation time
+		// update with next revalidation time
 		cache.revalidate_access = Date.now() + DEFAULT_REVALIDATE;
-        recache = true;
+		recache = true;
 	}
 
 	if (recache) {
 		// dont bother awaiting this promise as we return the
-        // updates directly
+		// updates directly
 		persistSession(
 			sessionId,
 			cache.session_expiry,

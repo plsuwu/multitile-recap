@@ -34,7 +34,6 @@ export interface TwitchUser {
 	id: string;
 	display_name: string;
 	login: string;
-	created_at: string;
 	profile_image_url: string;
 
 	// not natively to HELIX.USER response objects

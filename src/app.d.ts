@@ -1,4 +1,5 @@
 import type { session } from '$auth';
+import type { TwitchUser, TwitchTokens, SessionData } from '$types';
 import type { Twitch } from 'arctic';
 
 // import 'unplugin-icons/types/svelte';
@@ -6,9 +7,9 @@ import type { Twitch } from 'arctic';
 declare global {
 	namespace App {
 		interface Locals {
-			user: any | null;
-			tokens: session.SessionTokens | null;
-			session: session.SessionData | null;
+			user: TwitchUser | null;
+			tokens: TwitchTokens | null;
+			session: SessionData | null;
 			syncStatus: Promise<any | any[]>;
 		}
 	}

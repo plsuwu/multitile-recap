@@ -1,4 +1,5 @@
 import { TWITCH_CLIENT_ID } from '$env/static/private';
+import { log } from '$logging';
 
 export const SCOPES = ['user:read:follows', 'user:read:subscriptions'];
 export const HELIX = {
@@ -31,19 +32,17 @@ export enum AuthorizationPrefix {
  */
 export function authorizedHeadersFrom(
 	token: string,
-	authType: AuthorizationPrefix = AuthorizationPrefix.Bearer,
+	prefix: 'Bearer' | 'OAuth' = 'Bearer',
 	client: string = TWITCH_CLIENT_ID,
 	extended: Record<string, string>[] | null = null,
 ): Headers {
-	const authPrefix =
-		authType === AuthorizationPrefix.Bearer ? 'Bearer' : 'OAuth';
-
+	console.log('t->', token, 'p->', prefix, 'c->', client, 'e->', extended);
 	const headers: Headers = new Headers({
-		Authorization: `${authPrefix} ${token}`,
+		Authorization: `${prefix} ${token}`,
 		'Client-Id': client,
 	});
 
-	if (extended) {
+	if (extended !== null) {
 		extended.forEach((record) => {
 			Object.entries(record).forEach(([key, val]) => {
 				headers.append(key, val);
