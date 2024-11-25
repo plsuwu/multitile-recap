@@ -6,10 +6,6 @@
 
 	let { children, data }: { children: Snippet, data: PageData } = $props();
     let { user } = $state(data);
-
-
-    $inspect(user);
-
 </script>
 
 <div class="flex min-h-screen flex-col">
@@ -19,7 +15,7 @@
 	</div>
     {/key}
 
-	<div class="flex flex-1 flex-col items-center justify-center">
+	<div class="flex flex-1 flex-col h-full">
 		{@render children()}
 	</div>
 </div>

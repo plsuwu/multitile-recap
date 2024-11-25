@@ -34,18 +34,7 @@ export class RedisHandler {
 		});
 	}
 
-	private getKey(ePrefix: KeyPrefix, suffix: string) {
-		let prefix;
-
-		switch (ePrefix) {
-			case KeyPrefix.User:
-				prefix = 'user';
-			case KeyPrefix.Tokens:
-				prefix = 'tokens';
-			default:
-				prefix = 'session';
-		}
-
+	private getKey(prefix: 'user' | 'tokens' | 'session', suffix: string) {
 		return `${prefix}:${suffix}`;
 	}
 
@@ -57,12 +46,11 @@ export class RedisHandler {
 	 * @returns A session object corresponding to the given sessionId, or null otherwise
 	 */
 	public async getSessionFromCache<T = SessionData>(sessionId: string): Promise<T | null> {
-		const key = this.getKey(KeyPrefix.Session, sessionId);
+		const key = this.getKey('session', sessionId);
 		const session = await redis.redis.hgetall(key);
 		log.debug(
-			`@ REDIS: 'hgetall' for session using key '${key} returned hash`
+			`@ REDIS: 'hgetall' for session using key '${key} returned hash for user '${session.user_id}'`
 		);
-        log.debug(session);
 
 		if (!session) {
 			return null;
@@ -78,11 +66,11 @@ export class RedisHandler {
 	public async getUserFromCache<T = TwitchUser>(
 		userId: string,
 	): Promise<T | null> {
-		const key = this.getKey(KeyPrefix.User, userId);
+		const key = this.getKey('user', userId);
 		const user = await this.redis.hgetall(key);
 
 		log.debug(
-			`@ REDIS: 'hgetall' for user using key '${key} returned hash ${user.id}`,
+			`@ REDIS: 'hgetall' for user using key '${key} returned hash for user '${user.id}'`,
 		);
 		if (!user) {
 			return null;
@@ -100,11 +88,10 @@ export class RedisHandler {
 	public async getTokensFromCache<T = TwitchTokens>(
 		id: string,
 	): Promise<T | null> {
-		const key = this.getKey(KeyPrefix.Tokens, id);
+		const key = this.getKey('tokens', id);
 		const tokens = await this.redis.hgetall(key);
 		log.debug(
-			`@ REDIS: 'hgetall' for tokens using key '${key}' returned hash:`,
-			tokens,
+			`@ REDIS: 'hgetall' for tokens using key '${key}' returned hash for token '${new Array(tokens.access.length).fill('*').join('')}'`,
 		);
 
 		if (!tokens) {
@@ -124,9 +111,9 @@ export class RedisHandler {
 		suffix: string,
 		data: SessionData,
 	): Promise<void> {
-		const key = this.getKey(KeyPrefix.Session, suffix);
+		const key = this.getKey('session', suffix);
 		if (await this.redis.exists(key)) {
-			log.debug(`@ REDIS: @ 'set<_>InCache': '${key}' already exists`);
+			log.debug(`@ REDIS: @ 'set_InCache': '${key}' already exists`);
 			log.debug(
 				'(current function is to run the hset operation and overwrite)',
 			);
@@ -139,9 +126,9 @@ export class RedisHandler {
 	}
 
 	public async setCacheUser(suffix: string, data: TwitchUser): Promise<void> {
-		const key = this.getKey(KeyPrefix.User, suffix);
+		const key = this.getKey('user', suffix);
 		if (await this.redis.exists(key)) {
-			log.debug(`@ REDIS: @ 'set<_>InCache': '${key}' already exists`);
+			log.debug(`@ REDIS: @ 'set_InCache': '${key}' already exists`);
 			log.debug(
 				'(current function is to run the hset operation and overwrite)',
 			);
@@ -155,10 +142,10 @@ export class RedisHandler {
 		suffix: string,
 		data: TwitchTokens,
 	): Promise<void> {
-		const key = this.getKey(KeyPrefix.Tokens, suffix);
+		const key = this.getKey('tokens', suffix);
 
 		if (await this.redis.exists(key)) {
-			log.debug(`@ REDIS: @ 'set<_>InCache': '${key}' already exists`);
+			log.debug(`@ REDIS: @ 'set_InCache': '${key}' already exists`);
 			log.debug(
 				'(current function is to run the hset operation and overwrite)',
 			);

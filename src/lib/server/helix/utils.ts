@@ -52,3 +52,49 @@ export function authorizedHeadersFrom(
 
 	return headers;
 }
+
+/**
+ * transforms fetch options into a url-encoded string
+ * @param userId - the user's twitch_id
+ * @param first - when true, this param indicates whether to fetch the first user. when false (default), fetches the max number of following users.
+ * @param after - if defined, appends the previous request's cursor to the fetch request
+ * @returns a uri as a string used to fetch the user's followed channels
+ */
+export function followedUri(
+	userId: string,
+	after?: string,
+	first: boolean = false
+): string {
+	let uri = `${HELIX.FOLLOWED}?user_id=${userId}`;
+
+	// `after` contains the location of the current request cursor
+	// in the user's list of followed channels
+	if (after) {
+		uri += `&after=${after}`;
+	}
+
+	if (!first) {
+		// we aren't running debug stuff, so request the max amount of channels per request
+		uri += '&first=100';
+	}
+
+	return uri;
+}
+
+/**
+ * creates POST-able data from a JSON-like object that can be used when the `Content-Type` header is set to
+ * `application/x-www-form-urlencoded`
+ * @param body - a `{ key: value }`-structure
+ * @returns the data in the `body` arg as a URL-encoded string
+ */
+export function makeEncodedPayload(body: Record<string, any>) {
+	const buffer = new Array();
+	for (const prop in body) {
+		let key = encodeURIComponent(prop);
+		let val = encodeURIComponent(body[prop]);
+		buffer.push(key + '=' + val);
+	}
+
+	return buffer.join('&');
+}
+

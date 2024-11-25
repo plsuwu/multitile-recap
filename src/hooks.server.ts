@@ -51,7 +51,6 @@ const authHandle: Handle = async ({ event, resolve }) => {
 	} else {
 		try {
 			setSessionCookie(event, token, new Date(session.session_expiry));
-            log.debug(`${event.cookies.get('_session')}`);
 		} catch (err) {
             console.error(err);
 			log.debug(HOOK(routeId).ERROR.SETTING_COOKIE(err as Error));
