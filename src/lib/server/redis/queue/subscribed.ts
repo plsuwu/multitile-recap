@@ -4,8 +4,8 @@ import {
 } from '$env/static/private';
 import { Redis } from 'ioredis';
 import { Queue, QueueEvents, Worker } from 'bullmq';
-import { FollowedSyncHelper } from '$server/bull/helpers/followed';
-import type { UserInsert } from '$types';
+import { SubscriptionSyncHelper } from '$server/bull/helpers/subscriptions';
+import type { SubscriptionInsert, UserInsert } from '$types';
 
 const REDIS_URL = process.env.PRODUCTION ? REDIS_CONTAINER_HOST : 'localhost';
 const REDIS_PORT = process.env.PRODUCTION ? Number(REDIS_CONTAINER_PORT) : 6379;
@@ -16,45 +16,44 @@ const connection = new Redis({
 	maxRetriesPerRequest: null,
 });
 
-export const fetchQueue = new Queue('fetch_followed', {
+export const fetchQueue = new Queue('fetch_subscriptions', {
 	connection,
 });
 
-export const queueEvents = new QueueEvents('fetch_followed', { connection });
+export const queueEvents = new QueueEvents('fetch_subscriptions', {
+	connection,
+});
 
 export const fetchWorker = new Worker(
-	'fetch_followed',
+	'fetch_subscriptions',
 	async (job) => {
 		const { userId, access } = job.data;
 
-		const sync = new FollowedSyncHelper(access);
+		const sync = new SubscriptionSyncHelper(access);
 		let total: number;
 		let complete = 0;
 
 		try {
-			total = await sync.getFollowedLength(userId);
+			const cachedTotal = await getFollowedProgress(userId);
+            total = cachedTotal.total;
 		} catch (err) {
 			console.error(err);
 			throw err;
 		}
 
-		updateBatchProgress(userId, {
-			complete: 0,
-			total: 1,
-			status: 'processing',
-		});
+		const currentBatchProgress = await getBatchProgress(userId);
 
 		updateProgress(userId, {
-			complete,
-			total,
+			complete: 1,
+			total: currentBatchProgress.total,
 			status: 'processing',
 			message: `beginning initial followed lookup`,
 		});
-
 		try {
-			const followed = await sync.getFollowed(
+			const _subscriptions = await sync.getSubscriptions(
 				userId,
-				async (br: UserInsert, _: any) => {
+				async (br: any | string, _: any) => {
+                    console.log(complete, total);
 					complete = complete + 1;
 					try {
 						await updateProgress(userId, {
@@ -65,6 +64,7 @@ export const fetchWorker = new Worker(
 							color: `${br.color || '#000000'}`,
 						});
 					} catch (err) {
+                        console.error(err);
 						throw err;
 					}
 				},
@@ -74,7 +74,7 @@ export const fetchWorker = new Worker(
 				complete: total,
 				total,
 				status: 'completed',
-				message: followed[total - 1].login,
+				message: 'subscription sync ok',
 			});
 
 		} catch (err) {
@@ -90,7 +90,7 @@ export const fetchWorker = new Worker(
 
 async function updateProgress(userId: string, progression: any) {
 	await connection.set(
-		`followed_job_progress:${userId}`,
+		`subscriptions_job_progress:${userId}`,
 		JSON.stringify(progression),
 		'EX',
 		3600,
@@ -106,9 +106,22 @@ async function updateBatchProgress(userId: string, progression: any) {
 	);
 }
 
+async function getFollowedProgress(userId: string) {
+	const cached = await connection.get(`followed_job_progress:${userId}`);
+	if (cached) {
+		return JSON.parse(cached);
+	}
+}
+
+async function getBatchProgress(userId: string) {
+	const cached = await connection.get(`batch_progress:${userId}`);
+	if (cached) {
+		return JSON.parse(cached);
+	}
+}
+
 fetchWorker.on('failed', async (job, error) => {
 	console.error(`queued job ${job?.id} failed:`, error);
-
 	if (job?.data.userId) {
 		await updateProgress(job.data.userId, {
 			complete: null,
@@ -123,5 +136,6 @@ fetchWorker.on('failed', async (job, error) => {
 			status: 'failed',
 			message: error.message,
 		});
+
 	}
 });

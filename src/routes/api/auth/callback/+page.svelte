@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
+    import { getAlertState } from '$components/alerts/state.svelte';
 	import { onMount } from 'svelte';
 
 	let { data }: any = $props();
-	const { user } = data;
+	const { user, state } = data;
 
 	onMount(() => {
 		setTimeout(() => {
-			window.location.href = '/';
+			window.location.href = `/?regen`;
 		}, 1500);
 	});
 </script>

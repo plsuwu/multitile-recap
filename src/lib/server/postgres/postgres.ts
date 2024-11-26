@@ -1,7 +1,7 @@
 import type { FollowInsert, FollowSelect, UserInsert } from '$types';
 import { and, eq, gt } from 'drizzle-orm';
 import { db } from './db';
-import { follows, users } from './schema';
+import { follows, subscriptions, users } from './schema';
 
 /** three days */
 const RESYNC_THRESHOLD = 1000 * 60 * 60 * 24 * 3;
@@ -51,6 +51,15 @@ export const pg = {
                         broadcaster: true,
                     },
                 }).execute();
+        },
+
+        subscriptions: async (userId: string) => {
+            return await db.query.subscriptions.findMany({
+                where: eq(subscriptions.user_id, userId),
+                with: {
+                    broadcaster: true,
+                },
+            }).execute();
         },
     },
 };

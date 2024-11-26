@@ -10,7 +10,7 @@ declare global {
 			user: TwitchUser | null;
 			tokens: TwitchTokens | null;
 			session: SessionData | null;
-			syncStatus: Promise<any | any[]>;
+            alert: any | undefined;
 		}
 	}
 }

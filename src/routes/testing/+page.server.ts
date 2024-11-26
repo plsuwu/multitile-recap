@@ -1,10 +1,11 @@
+import { dev } from "$app/environment";
 import { HELIX } from "$server/helix/utils";
-import type { Actions, RequestEvent } from "@sveltejs/kit";
+import { redirect, type Actions, type RequestEvent } from "@sveltejs/kit";
 
 export const load = async (event: RequestEvent) => {
     const { user } = event.locals;
-    if (!user) {
-        return {};
+    if (!user || !dev) {
+        redirect(302, '/');
     }
 
     return {
@@ -15,7 +16,7 @@ export const load = async (event: RequestEvent) => {
 export const actions = {
     enqueue: async (event) => {
         // post endpoint data to '/api/data/enqueue' route;
-        const endpoints = [`${HELIX.FOLLOWED}?user_id=${event.locals.user?.id}`];
+        const endpoints = [`${HELIX.FOLLOWED}?user_id=${event.locals.user?.id}`, `${HELIX.SUBSCRIPTIONS}`];
         const test_post = await event.fetch('/api/data/enqueue', {
             method: 'POST',
             headers: {

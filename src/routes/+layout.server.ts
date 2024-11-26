@@ -4,9 +4,10 @@ import { log } from "$logging";
 
 
 export async function load (event: RequestEvent) {
+
     const { user } = event.locals;
 
     return {
-        user
+        user,
     }
 }

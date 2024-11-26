@@ -1,24 +1,14 @@
-export interface APIError {
-	code: string;
-	message: string;
-	userMessage?: string;
-	status: number;
-}
+import type { AlertProps } from "$types/components/alert";
+import { AlertState } from "$components/error/error-state.svelte";
 
 export class APIError extends Error {
-	constructor(
-		message: string,
-		public code: string,
-		public status: number,
-		public reason: string,
-	) {
-		super(message);
-		this.name = 'APIError';
-	}
+    userMessage: AlertProps;
+    constructor(message: string, code: string, status = 500) {
+        super(message);
+        this.userMessage = {
+            id:
+        }
+    }
 }
 
-export class AuthenticationError extends APIError {
-	constructor(message: string, userMessage?: string, status?: number) {
-		super(message, 'AUTH_PROVIDER_ERROR', status || 400, '');
-	}
-}
+

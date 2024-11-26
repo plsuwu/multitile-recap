@@ -10,7 +10,7 @@ import { RateLimitError } from 'bullmq';
 import { pullFollowedFromHelix } from '$server/helix/followed';
 import type { UserInsert } from '$types';
 
-export class SyncHelper {
+export class FollowedSyncHelper {
     private headers;
 
     constructor(token: string) {
@@ -151,7 +151,7 @@ export class SyncHelper {
         }
     }
 
-    async getFollowed(userId: string, callback?: (br: UserInsert) => void) {
+    async getFollowed(userId: string, callback?: (br: UserInsert, idx: number) => Promise<void>) {
         let stored;
         let len: number;
         try {
@@ -167,12 +167,15 @@ export class SyncHelper {
                 return stored;
             }
 
+            let processed = 0;
             const updates = await pullFollowedFromHelix(userId, this.headers);
             const followed = await Promise.all(
                 updates.map(async (ch) => {
+                    processed += 1;
+
                     const br = await this.getUser(ch.broadcaster_id);
                     if (callback) {
-                        callback(br);
+                        await callback(br, processed);
                     }
                     return br;
                 }),
@@ -184,3 +187,4 @@ export class SyncHelper {
         }
     }
 }
+

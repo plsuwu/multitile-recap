@@ -1,21 +1,30 @@
 <script lang="ts">
-	import Nav from '$components/nav/Nav.svelte';
-	import type { Snippet } from 'svelte';
 	import '../app.css';
+	import type { Snippet } from 'svelte';
 	import type { PageData } from './$types';
+	import { setAlertState } from '$components/alerts/state.svelte';
 
-	let { children, data }: { children: Snippet, data: PageData } = $props();
-    let { user } = $state(data);
+	import Nav from '$components/nav/Nav.svelte';
+	import Alerter from '$components/alerts/Alerter.svelte';
+
+	let { children, data }: { children: Snippet; data: PageData } = $props();
+	let { user } = $state(data);
+
+	setAlertState();
 </script>
 
 <div class="flex min-h-screen flex-col">
-    {#key user}
-	<div class="flex flex-col justify-center items-center">
-		<Nav {user} />
-	</div>
-    {/key}
+    <div class='w-full flex flex-col'>
+    	<Alerter />
+    </div>
 
-	<div class="flex flex-1 flex-col h-full">
+	{#key user}
+		<div class="flex flex-col items-center justify-center">
+			<Nav {user} />
+		</div>
+	{/key}
+
+	<div class="flex h-full flex-1 flex-col items-center">
 		{@render children()}
 	</div>
 </div>
