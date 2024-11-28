@@ -17,7 +17,7 @@ export const actions = {
     enqueue: async (event) => {
         // post endpoint data to '/api/data/enqueue' route;
         const endpoints = [`${HELIX.FOLLOWED}?user_id=${event.locals.user?.id}`, `${HELIX.SUBSCRIPTIONS}`];
-        const test_post = await event.fetch('/api/data/enqueue', {
+        const _enqueue = await event.fetch('/api/data/enqueue', {
             method: 'POST',
             headers: {
                 'content-type': 'application/x-www-form-urlencoded',
@@ -25,7 +25,13 @@ export const actions = {
             body: JSON.stringify({ endpoints }),
         });
 
-        console.log('[*] resolved test_post response:', await test_post.json());
+        const status = await event.fetch(`/api/data/status/${event.locals.user?.id}`, {
+            method: 'GET',
+        });
+
+        const body = await status.json();
+        console.log('[&] STATUS-> ', body);
+        return body;
     },
 
     status: async (event) => {

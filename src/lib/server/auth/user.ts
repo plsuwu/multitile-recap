@@ -5,7 +5,7 @@ import { KeyPrefix } from '$redis/redis';
 import redis from '$redis';
 import type { TwitchTokens, TwitchUser, UserInsert } from '$types';
 
-export async function makeNewUser(user: UserInsert, tokens: TwitchTokens) {
+export async function makeNewCacheUser(user: UserInsert, tokens: TwitchTokens) {
 	const cached: TwitchUser = {
 		id: user.id,
 		display_name: user.display_name,
@@ -16,6 +16,5 @@ export async function makeNewUser(user: UserInsert, tokens: TwitchTokens) {
 
 	await redis.setCacheUser(user.id, cached);
 	await redis.setCacheTokens(user.id, tokens);
-
 	await pg.insert.user(user);
 }

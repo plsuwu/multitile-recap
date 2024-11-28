@@ -13,13 +13,33 @@ interface RedisConfig {
 	ttl?: number;
 }
 
-const REDIS_URL = process.env.PRODUCTION ? REDIS_CONTAINER_HOST : 'localhost';
-const REDIS_PORT = process.env.PRODUCTION ? Number(REDIS_CONTAINER_PORT) : 6379;
+export const REDIS_URL = process.env.PRODUCTION ? REDIS_CONTAINER_HOST : 'localhost';
+export const REDIS_PORT = process.env.PRODUCTION ? Number(REDIS_CONTAINER_PORT) : 6379;
+
+export const connection = new Redis({
+	host: REDIS_URL,
+	port: REDIS_PORT,
+    maxRetriesPerRequest: null,
+})
 
 export enum KeyPrefix {
 	Session,
 	User,
 	Tokens,
+}
+
+export class QueueHandler {
+    public redis: Redis;
+    private readonly ttl: number = 3600;
+
+    constructor(config: RedisConfig) {
+        this.redis = new Redis({
+            host: config.host,
+            port: config.port,
+            password: config.password,
+        })
+    }
+
 }
 
 export class RedisHandler {
@@ -157,17 +177,6 @@ export class RedisHandler {
 		pipeline.expire(key, this.ttl); // keep OAuth info for 30 days
 		await pipeline.exec();
 	}
-
-	// idk this probably wont actually get used anyway
-	// public async updateCacheData<T>(prefix: KeyPrefix, suffix: string, data: T) {
-	//     const key = this.getKey(prefix, suffix);
-	//
-	//     log.debug(`@ REDIS: updating data on ${key}`);
-	//
-	//     const pipeline = this.redis.pipeline();
-	//     pipeline.expire(key, this.ttl);
-	//     await pipeline.exec();
-	// }
 }
 
 export const redis = new RedisHandler({ host: REDIS_URL, port: REDIS_PORT });

@@ -1,7 +1,6 @@
 export type AlertProps = {
 	id: string;
-    alertType: 'error' | 'sync';
+    type: 'info' | 'success' | 'warning' | 'error';
 	title: string;
 	message: string;
-	status: number;
 };

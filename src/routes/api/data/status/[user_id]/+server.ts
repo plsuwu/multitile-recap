@@ -1,32 +1,52 @@
 import type { RequestEvent } from '@sveltejs/kit';
-import { json } from '@sveltejs/kit';
-import redis from '$server/redis';
+import { processors } from '$server/bull/processors';
+import { connection as redis } from '$redis/redis';
+import { activeConnections, notifyClients } from './utils';
+
 
 export const GET = async (event: RequestEvent) => {
-	const { user } = event.locals;
-	if (!user) {
-		return json(
-			{
-				error: true,
-				message: 'must be logged in to check fetch job process',
-			},
-			{ status: 401 },
-		);
-	}
+    const { user } = event.locals;
+    console.log('RECEIVED AN EVENT:', event);
+    if (!user) {
 
-	const progress = {
-		followed: await redis.redis.get(`followed_job_progress:${user.id}`),
-		subscriptions: await redis.redis.get(
-			`subscriptions_job_progress:${user.id}`,
-		),
-		badges: await redis.redis.get(`badges_job_progress:${user.id}`),
-        all: await redis.redis.get(`batch_progress:${user.id}`),
-	};
+        return new Response('LOGIN_REQUIRED', {
+            status: 400,
+        });
+    }
 
-	progress.badges = progress.badges ? JSON.parse(progress.badges) : null;
-	progress.subscriptions = progress.subscriptions ? JSON.parse(progress.subscriptions) : null;
-	progress.followed = progress.followed ? JSON.parse(progress.followed) : null;
-    progress.all = progress.all ? JSON.parse(progress.all) : null;
+    const progress = await Promise.all(
+        Object.keys(processors).map(async (processor) => {
+            console.log(`progress:${processor}:${user.id}`);
+            const data = await redis.get(`progress:${processor}:${user.id}`);
+            return data ? JSON.parse(data) : null;
+        }),
+    );
 
-	return json(progress);
+    console.log(progress);
+
+    const stream = new ReadableStream({
+        start(controller) {
+            activeConnections.set(user.id, controller);
+
+            progress.forEach((proc) => {
+                if (proc) {
+                    console.log('PROC->', proc.processor);
+                    notifyClients(proc);
+                }
+            });
+
+            return () => {
+                activeConnections.delete(user.id);
+            };
+        },
+    });
+
+    return new Response(stream, {
+        headers: {
+            'content-type': 'text/event-stream',
+            'cache-control': 'no-cache',
+            connection: 'keep-alive',
+        },
+    });
 };
+

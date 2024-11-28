@@ -1,4 +1,4 @@
-import type { FollowInsert, FollowSelect, UserInsert } from '$types';
+import type { FollowInsert, FollowSelect, SubscriptionInsert, UserInsert } from '$types';
 import { and, eq, gt } from 'drizzle-orm';
 import { db } from './db';
 import { follows, subscriptions, users } from './schema';
@@ -25,7 +25,28 @@ export const pg = {
         },
 
         follows: async (data: FollowInsert) => {
-            db.insert(follows).values(data).onConflictDoNothing();
+            await db.insert(follows).values(data).onConflictDoUpdate({
+                target: [follows.user_id, follows.broadcaster_id],
+                set: {
+                    user_id: data.user_id,
+                    broadcaster_id: data.broadcaster_id,
+                    followed_at: data.followed_at,
+                    last_sync: new Date(),
+                }
+            });
+        },
+
+        subscriptions: async (data: SubscriptionInsert) => {
+            await db.insert(subscriptions).values(data).onConflictDoUpdate({
+                target: [subscriptions.user_id, subscriptions.broadcaster_id],
+                set: {
+                    last_sync: new Date(),
+                    tier: data.tier,
+                    is_gift: data.is_gift,
+                    gifter_id: data.gifter_id,
+                    gifter_name: data.gifter_name,
+                },
+            });
         },
     },
 

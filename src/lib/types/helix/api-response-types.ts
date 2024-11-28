@@ -37,16 +37,18 @@ export interface HelixUserData {
  * @property {number} total
  * */
 export interface HelixFollowedData {
-	data: Array<{
-		broadcaster_id: string;
-		broadcaster_login: string;
-		broadcaster_name: string;
-		followed_at: string;
-	}>;
+	data: HelixFollowedDataObject[];
 	pagination: {
 		cursor?: string;
 	};
 	total: number;
+}
+
+export type HelixFollowedDataObject = {
+	broadcaster_id: string;
+	broadcaster_login: string;
+	broadcaster_name: string;
+	followed_at: string;
 }
 
 /**

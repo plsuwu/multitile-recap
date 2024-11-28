@@ -1,34 +1,38 @@
-import { json } from '@sveltejs/kit';
-import { fetchQueue as fQueue } from '$redis/queue/followed';
-import { fetchQueue as sQueue } from '$redis/queue/subscribed';
-import type { RequestEvent, RequestHandler } from '@sveltejs/kit';
-import { log } from '$logging';
-import { subscriptions } from '$server/postgres/schema';
+import { processors } from '$server/bull/processors';
+import { fetchQueue } from '$server/bull/queue/queue';
+import { json, type RequestEvent } from '@sveltejs/kit';
+import { notifyClients } from '../status/[user_id]/utils';
+import type { JobProgress } from '$types/queue/types';
+import { connection as redis } from '$server/redis/redis';
 
 export const POST = async (event: RequestEvent) => {
     const { user, tokens } = event.locals;
-    log.debug(`[/api/data/enqueue][JOB QUEUE]: user.id: ${user?.id}`);
-    log.debug(`[/api/data/enqueue][JOB QUEUE]: user.id: ${tokens?.access}`);
+    if (!user || !tokens) {
+        return json(
+            { error: true, message: 'no local user/token in request' },
+            { status: 400 },
+        );
+    }
 
-    const userId = user?.id;
-    const access = tokens?.access;
+    const jobs = await Promise.all(
+        Object.keys(processors).map((processor) => {
+            return fetchQueue.add(`fetch:${processor}`, {
+                processor: processor as keyof typeof processors,
+                userId: user.id,
+                access: tokens.access,
+            });
+        }),
+    );
 
-    console.log('UID +  ACC:', userId, access);
-
-    const { followEndpoints, subscribeEndpoints } = await event.request.json();
-    console.log('endpoints=>', followEndpoints, subscribeEndpoints);
-
-    const follow = await fQueue.add('fetch', {
-        userId,
-        access,
-        endpoints: [followEndpoints],
+    Object.keys(processors).forEach(async (p) => {
+        const data = await redis.get(`progress:${p}:${user.id}`);
+        if (data) {
+            notifyClients(JSON.parse(data));
+        }
     });
 
-    const subscribe = await sQueue.add('fetch', {
-        userId,
-        access,
-        endpoints: [subscribeEndpoints],
-    });
-
-    return json({ followId: follow.id, subscribeId: subscribe.id });
+    return json(
+        { error: false, jobIds: jobs.map((job) => job.id) },
+        { status: 200 },
+    );
 };

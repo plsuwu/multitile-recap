@@ -7,6 +7,21 @@
 	import { getAlertState } from '$components/alerts/state.svelte';
 	const alertState = getAlertState();
 
+    async function enqueue() {
+        const job = await fetch('/api/data/enqueue', {
+            method: 'POST',
+        });
+
+        const status = await fetch(`/api/data/status/${user?.id}`, {
+            method: 'GET',
+        });
+
+        const body = await status.json();
+        console.log('[&] STATUS-> ', body);
+        return body;
+
+    }
+
 	function genRandString(len: number = 75) {
 		const alphan = 'abcdefghijklmnopqrstuvwxyz1234567890';
 
@@ -20,8 +35,9 @@
 
 	let message = $state(genRandString());
 	let status: number | undefined = $state(500);
-	let alertType: 'error' | 'sync' = $state('sync');
+	let alertType: 'info' | 'success' | 'warning' | 'error' = $state('info');
 	let titleInput = $state<HTMLInputElement>();
+    let jobStarted = $state(false);
 
 	let { data }: { data: { user: TwitchUser } } = $props();
 	let { user } = data;
@@ -34,7 +50,6 @@
 		});
 
 		const body = await response.json();
-		// console.log(body);
 		return body;
 	}
 
@@ -83,7 +98,7 @@
 	<form
 		onsubmit={(e) => {
 			e.preventDefault();
-			alertState.add(alertType, message, status || 500);
+			alertState.add(alertType, { status: message }, user?.id);
 			message = genRandString();
 			status = 500;
 
@@ -99,8 +114,10 @@
 			class="rounded-md border p-1"
 			bind:value={alertType}
 		>
-			<option> error </option>
-			<option> sync </option>
+			<option>info</option>
+			<option>success</option>
+			<option>warning</option>
+			<option>error</option>
 		</select>
 		<label for="message">message</label>
 		<input
@@ -120,15 +137,11 @@
 	</form>
 </div>
 <div class="mb-12">
-	<form method="POST" class="flex flex-col" action="?/enqueue">
-		<button>test '/api/data/enqueue'</button>
-	</form>
-	<form method="POST" class="flex flex-col" action="?/status">
-		<button>test '/api/data/status'</button>
-	</form>
+		<button onclick={enqueue}>test '/api/data/enqueue'</button>
+		<!-- <button onclick={}>test '/api/data/status'</button> -->
 </div>
 
-<SyncStatus {user} />
+<!-- <SyncStatus {user} {jobStarted} /> -->
 <SearchTest bind:query />
 
 {#if results && results.length > 0}
